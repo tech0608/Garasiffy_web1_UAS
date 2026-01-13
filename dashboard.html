@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Member | Garasifyy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/form-fixes.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading bg-danger text-white p-3 fw-bold">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard Garasifyy
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="#dashboard" class="list-group-item list-group-item-action py-3 active" data-section="dashboard">
+                    <i class="fas fa-home me-2"></i>Ringkasan
+                </a>
+                <a href="#projects" class="list-group-item list-group-item-action py-3" data-section="projects">
+                    <i class="fas fa-project-diagram me-2"></i>Proyek Aktif
+                </a>
+                <a href="#payments" class="list-group-item list-group-item-action py-3" data-section="payments">
+                    <i class="fas fa-credit-card me-2"></i>Riwayat Pembayaran
+                </a>
+                <a href="#profile" class="list-group-item list-group-item-action py-3" data-section="profile">
+                    <i class="fas fa-user me-2"></i>Pengaturan Profil
+                </a>
+                <a href="#services" class="list-group-item list-group-item-action py-3" data-section="services">
+                    <i class="fas fa-tools me-2"></i>Layanan
+                </a>
+                <a href="#support" class="list-group-item list-group-item-action py-3" data-section="support">
+                    <i class="fas fa-headset me-2"></i>Support
+                </a>
+                <button class="list-group-item list-group-item-action py-3 text-danger" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="flex-grow-1">
+            <!-- Top Navigation -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+                <div class="container-fluid">
+                    <h4 class="mb-0 text-dark">
+                        <i class="fas fa-car text-danger me-2"></i>
+                        Halo, <span class="text-gradient fw-bold">Member Garasifyy!</span>
+                    </h4>
+                    <div class="navbar-nav">
+                        <div class="nav-item dropdown me-3">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-external-link-alt text-danger me-1"></i>Quick Links
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="index.html"><i class="fas fa-home text-primary me-2"></i>Beranda</a></li>
+                                <li><a class="dropdown-item" href="detail.html"><i class="fas fa-tools text-success me-2"></i>Detail Layanan</a></li>
+                                <li><a class="dropdown-item" href="detail.html?info=performa"><i class="fas fa-tachometer-alt text-warning me-2"></i>Performance</a></li>
+                                <li><a class="dropdown-item" href="detail.html?info=body"><i class="fas fa-car text-info me-2"></i>Body Kit</a></li>
+                                <li><a class="dropdown-item" href="detail.html?info=interior"><i class="fas fa-music text-danger me-2"></i>Interior & Audio</a></li>
+                            </ul>
+                        </div>
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-bell text-danger"></i>
+                                <span class="badge bg-danger badge-sm">3</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-info-circle text-info me-2"></i>Proyek body kit 80% selesai</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-check text-success me-2"></i>Pembayaran berhasil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-calendar text-warning me-2"></i>Jadwal konsultasi besok</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Dashboard Content -->
+            <div class="container-fluid p-4">
+                
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section">
+                    <h2 class="mt-4 fw-bold text-gradient fade-in-up">Status Mobil Anda</h2>
+                    
+                    <!-- Stats Cards -->
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card text-white bg-gradient h-100 shadow-lg stat-card" style="background: linear-gradient(45deg, #dc3545, #ff4500);">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-project-diagram fa-3x mb-3"></i>
+                                    <h5 class="card-title">PROYEK AKTIF</h5>
+                                    <h1 class="display-4 fw-bold">2</h1>
+                                    <p class="card-text">Sedang Dikerjakan</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card text-white bg-gradient h-100 shadow-lg stat-card" style="background: linear-gradient(45deg, #0d1117, #1a1a1a);">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-money-bill-wave fa-3x mb-3"></i>
+                                    <h5 class="card-title">TOTAL INVOICE</h5>
+                                    <h1 class="display-6 fw-bold">Rp 75 Jt</h1>
+                                    <p class="card-text">Investment Modifikasi</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card text-white bg-gradient h-100 shadow-lg stat-card" style="background: linear-gradient(45deg, #28a745, #20c997);">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                                    <h5 class="card-title">PROYEK SELESAI</h5>
+                                    <h1 class="display-4 fw-bold">5</h1>
+                                    <p class="card-text">Sudah Diserahkan</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card text-white bg-gradient h-100 shadow-lg stat-card" style="background: linear-gradient(45deg, #ffc107, #fd7e14);">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-star fa-3x mb-3"></i>
+                                    <h5 class="card-title">RATING</h5>
+                                    <h1 class="display-4 fw-bold">4.9</h1>
+                                    <p class="card-text">Kepuasan Customer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Projects -->
+                    <div class="row mt-4">
+                        <div class="col-lg-8">
+                            <div class="card bg-dark-custom text-light shadow-lg">
+                                <div class="card-header bg-danger">
+                                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Proyek Terbaru</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th><i class="fas fa-hashtag me-1"></i>No</th>
+                                                    <th><i class="fas fa-project-diagram me-1"></i>Nama Proyek</th>
+                                                    <th><i class="fas fa-calendar me-1"></i>Tanggal Mulai</th>
+                                                    <th><i class="fas fa-info-circle me-1"></i>Status</th>
+                                                    <th><i class="fas fa-percentage me-1"></i>Progress</th>
+                                                    <th><i class="fas fa-cogs me-1"></i>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>Upgrade Rem Brembo</td>
+                                                    <td>01/10/2025</td>
+                                                    <td><span class="badge bg-success">Selesai</span></td>
+                                                    <td>
+                                                        <div class="progress" style="height: 8px;">
+                                                            <div class="progress-bar bg-success" style="width: 100%"></div>
+                                                        </div>
+                                                        100%
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-light">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>Kustom Body Kit V2</td>
+                                                    <td>15/11/2025</td>
+                                                    <td><span class="badge bg-warning">On-Going</span></td>
+                                                    <td>
+                                                        <div class="progress" style="height: 8px;">
+                                                            <div class="progress-bar bg-warning" style="width: 75%"></div>
+                                                        </div>
+                                                        75%
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-light">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>3</td>
+                                                    <td>Audio System Premium</td>
+                                                    <td>20/11/2025</td>
+                                                    <td><span class="badge bg-info">Planning</span></td>
+                                                    <td>
+                                                        <div class="progress" style="height: 8px;">
+                                                            <div class="progress-bar bg-info" style="width: 25%"></div>
+                                                        </div>
+                                                        25%
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-light">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <!-- Notifications Card -->
+                            <div class="card bg-dark-custom text-light shadow-lg mb-4">
+                                <div class="card-header bg-danger">
+                                    <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Pemberitahuan Penting</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="notification-item mb-3 p-3 rounded" style="background: rgba(255,0,64,0.1);">
+                                        <div class="d-flex">
+                                            <i class="fas fa-paint-brush text-warning fa-2x me-3"></i>
+                                            <div>
+                                                <h6 class="text-warning">Proses Pengecatan</h6>
+                                                <p class="small mb-0">Body kit sedang dalam tahap pengecatan akhir. Estimasi selesai 2 hari lagi.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="notification-item mb-3 p-3 rounded" style="background: rgba(40,167,69,0.1);">
+                                        <div class="d-flex">
+                                            <i class="fas fa-check-circle text-success fa-2x me-3"></i>
+                                            <div>
+                                                <h6 class="text-success">Part Telah Tiba</h6>
+                                                <p class="small mb-0">Komponen audio premium sudah tiba dan siap dipasang.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-light w-100" onclick="showAllNotifications()">
+                                        <i class="fas fa-list me-2"></i>Lihat Semua
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="card bg-dark-custom text-light shadow-lg">
+                                <div class="card-header bg-danger">
+                                    <h6 class="mb-0"><i class="fas fa-rocket me-2"></i>Aksi Cepat</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-light" onclick="newProject()">
+                                            <i class="fas fa-plus me-2"></i>Proyek Baru
+                                        </button>
+                                        <a href="detail.html" class="btn btn-outline-light">
+                                            <i class="fas fa-tools me-2"></i>Lihat Layanan
+                                        </a>
+                                        <button class="btn btn-outline-light" onclick="trackProject()">
+                                            <i class="fas fa-search me-2"></i>Lacak Proyek
+                                        </button>
+                                        <button class="btn btn-outline-light" onclick="contactSupport()">
+                                            <i class="fas fa-headset me-2"></i>Hubungi Support
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other sections will be shown/hidden by JavaScript -->
+                <div id="projects-section" class="content-section d-none">
+                    <h2 class="mt-4 fw-bold text-gradient">Manajemen Proyek</h2>
+                    <p class="lead text-light">Kelola semua proyek modifikasi Anda di sini.</p>
+                </div>
+
+                <div id="services-section" class="content-section d-none">
+                    <h2 class="mt-4 fw-bold text-gradient">Layanan Kami</h2>
+                    <p class="lead text-light">Jelajahi berbagai layanan modifikasi mobil yang tersedia.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-dark-custom text-light h-100 shadow-lg hover-scale" data-service="performa" style="cursor: pointer;">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tachometer-alt fa-3x text-danger mb-3"></i>
+                                    <h5 class="card-title text-danger">Performance Upgrade</h5>
+                                    <p class="card-text">Tingkatkan performa mesin dengan ECU tuning, turbocharger, dan komponen racing.</p>
+                                    <a href="detail.html?info=performa" class="btn btn-outline-danger mt-auto">
+                                        <i class="fas fa-eye me-2"></i>Lihat Detail
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-dark-custom text-light h-100 shadow-lg hover-scale" data-service="body" style="cursor: pointer;">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-car fa-3x text-danger mb-3"></i>
+                                    <h5 class="card-title text-danger">Body Kit & Estetika</h5>
+                                    <p class="card-text">Ubah tampilan mobil dengan body kit custom, wide body, dan paint job premium.</p>
+                                    <a href="detail.html?info=body" class="btn btn-outline-danger mt-auto">
+                                        <i class="fas fa-eye me-2"></i>Lihat Detail
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card bg-dark-custom text-light h-100 shadow-lg hover-scale" data-service="interior" style="cursor: pointer;">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-music fa-3x text-danger mb-3"></i>
+                                    <h5 class="card-title text-danger">Interior & Audio</h5>
+                                    <p class="card-text">Upgrade interior dengan material premium dan sistem audio berkualitas tinggi.</p>
+                                    <a href="detail.html?info=interior" class="btn btn-outline-danger mt-auto">
+                                        <i class="fas fa-eye me-2"></i>Lihat Detail
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card bg-dark-custom text-light shadow-lg">
+                                <div class="card-header bg-danger">
+                                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Layanan Unggulan</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center p-3 rounded" style="background: rgba(255,0,64,0.1);">
+                                                <i class="fas fa-award fa-2x text-warning me-3"></i>
+                                                <div>
+                                                    <h6 class="text-warning mb-1">Konsultasi Gratis</h6>
+                                                    <small class="text-light">Tim ahli siap membantu perencanaan modifikasi Anda</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center p-3 rounded" style="background: rgba(255,0,64,0.1);">
+                                                <i class="fas fa-shield-alt fa-2x text-success me-3"></i>
+                                                <div>
+                                                    <h6 class="text-success mb-1">Garansi Resmi</h6>
+                                                    <small class="text-light">Semua modifikasi dilengkapi garansi komprehensif</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center p-3 rounded" style="background: rgba(255,0,64,0.1);">
+                                                <i class="fas fa-users fa-2x text-info me-3"></i>
+                                                <div>
+                                                    <h6 class="text-info mb-1">Teknisi Berpengalaman</h6>
+                                                    <small class="text-light">Tim teknisi dengan pengalaman 10+ tahun</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center p-3 rounded" style="background: rgba(255,0,64,0.1);">
+                                                <i class="fas fa-clock fa-2x text-danger me-3"></i>
+                                                <div>
+                                                    <h6 class="text-danger mb-1">Update Progress</h6>
+                                                    <small class="text-light">Pantau progress modifikasi secara real-time</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="payments-section" class="content-section d-none">
+                    <h2 class="mt-4 fw-bold text-gradient">Riwayat Pembayaran</h2>
+                    <p class="lead text-light">Lihat semua transaksi dan invoice Anda.</p>
+                </div>
+
+                <div id="profile-section" class="content-section d-none">
+                    <h2 class="mt-4 fw-bold text-gradient">Pengaturan Profil</h2>
+                    <p class="lead text-light">Update informasi personal dan preferensi Anda.</p>
+                </div>
+
+                <div id="support-section" class="content-section d-none">
+                    <h2 class="mt-4 fw-bold text-gradient">Customer Support</h2>
+                    <p class="lead text-light">Butuh bantuan? Tim support kami siap membantu 24/7.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-custom">
+        <div class="container">
+            <p class="mb-0 small">@Copyright by 23552011045_Luthfy Arief_TIF_RP_23_CNS_A | Garasifyy</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/script.js"></script>
+    
+    <script>
+        // Dashboard specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar navigation
+            const sidebarLinks = document.querySelectorAll('.sidebar .list-group-item[data-section]');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Hide all sections
+                    contentSections.forEach(section => section.classList.add('d-none'));
+                    
+                    // Show target section
+                    const targetSection = this.getAttribute('data-section') + '-section';
+                    const section = document.getElementById(targetSection);
+                    if (section) {
+                        section.classList.remove('d-none');
+                    }
+                });
+            });
+            
+            // Animate stats cards on load
+            setTimeout(() => {
+                document.querySelectorAll('.stat-card').forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.transform = 'translateY(0)';
+                        card.style.opacity = '1';
+                    }, index * 150);
+                });
+            }, 500);
+        });
+        
+        // Quick action functions
+        function showAllNotifications() {
+            alert('Fitur notifikasi lengkap akan segera tersedia!');
+        }
+        
+        function newProject() {
+            alert('Formulir proyek baru akan segera diluncurkan!');
+        }
+        
+        function trackProject() {
+            alert('Sistem tracking real-time sedang dalam pengembangan!');
+        }
+        
+        function contactSupport() {
+            window.open('https://wa.me/6281234567890?text=Halo%20Garasifyy!%20Saya%20butuh%20bantuan%20customer%20support.', '_blank');
+        }
+    </script>
+    
+    <style>
+        .stat-card {
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.6s ease;
+        }
+        
+        .hover-scale {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 0, 64, 0.3) !important;
+        }
+        
+        .notification-item {
+            border-left: 4px solid var(--garasifyy-accent);
+            transition: all 0.3s ease;
+        }
+        
+        .notification-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .progress {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .table-dark {
+            --bs-table-bg: transparent;
+        }
+        
+        .dropdown-menu {
+            background: var(--garasifyy-dark);
+            border: 1px solid var(--garasifyy-accent);
+        }
+        
+        .dropdown-item {
+            color: var(--garasifyy-light);
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(255, 0, 64, 0.2);
+            color: var(--garasifyy-light);
+        }
+    </style>
+</body>
+</html>
