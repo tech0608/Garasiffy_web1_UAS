@@ -22,3 +22,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Firebase Service Account (secrets)
+*.json
+!package.json
+!package-lock.json
+!composer.json
+garasifyy-firebase-adminsdk-*.json
