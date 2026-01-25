@@ -466,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
         animateOnScroll(); // Run on page load
     }
 
-    // Enhanced login validation
+    // Enhanced login validation - supports admin and member
     function initLoginValidation() {
         const loginForm = document.getElementById('loginForm');
         
@@ -487,17 +487,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Simulate loading delay
                 setTimeout(() => {
-                    // Kredensial Validasi
-                    const validEmail = "user@utb.ac.id";
-                    const validPassword = "utsweb1";
+                    // Admin credentials
+                    const adminEmail = "admin@garasifyy.com";
+                    const adminPassword = "admin123";
+                    
+                    // Member credentials
+                    const memberEmail = "user@utb.ac.id";
+                    const memberPassword = "utsweb1";
 
-                    if (email === validEmail && password === validPassword) {
-                        showSuccessAlert("Login Berhasil! Selamat datang di Garasifyy Dashboard.");
+                    if (email === adminEmail && password === adminPassword) {
+                        // Admin login - redirect to admin dashboard
+                        showSuccessAlert("Login Admin Berhasil! Mengarahkan ke Dashboard Admin...");
+                        // Store admin session
+                        sessionStorage.setItem('userRole', 'admin');
+                        sessionStorage.setItem('userEmail', email);
                         setTimeout(() => {
-                            window.location.href = 'dashboard.html';
+                            window.location.href = 'admin.html';
+                        }, 1500);
+                    } else if (email === memberEmail && password === memberPassword) {
+                        // Member login - redirect to download app page
+                        showSuccessAlert("Login Berhasil! Silakan download aplikasi mobile Garasifyy.");
+                        sessionStorage.setItem('userRole', 'member');
+                        sessionStorage.setItem('userEmail', email);
+                        setTimeout(() => {
+                            window.location.href = 'download-app.html';
                         }, 1500);
                     } else {
-                        showErrorAlert("Login Gagal! Email atau Password salah.<br>Gunakan: <strong>user@utb.ac.id</strong> dan <strong>utsweb1</strong>");
+                        showErrorAlert("Login Gagal! Email atau Password salah.<br><strong>Admin:</strong> admin@garasifyy.com / admin123<br><strong>Member:</strong> user@utb.ac.id / utsweb1");
                         submitBtn.innerHTML = originalText;
                         submitBtn.disabled = false;
                         
@@ -509,6 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+
 
     // Enhanced detail page content
     function initDetailPage() {

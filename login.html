@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link href="css/style.css" rel="stylesheet">
     <link href="css/form-fixes.css" rel="stylesheet">
 </head>
+
 <body style="background: var(--garasifyy-gradient); min-height: 100vh;">
 
     <!-- Back to Home -->
@@ -28,37 +30,42 @@
                     </h2>
                     <p class="text-muted">Modifikasi Mobil Terbaik</p>
                 </div>
-                
+
                 <h3 class="card-title text-center mb-4 text-danger fw-bold text-uppercase">
                     <i class="fas fa-user-circle me-2"></i>Member Area
                 </h3>
-                
-                <form id="loginForm"> 
+
+                <form id="loginForm">
                     <div class="mb-3">
                         <label for="inputEmail" class="form-label text-light fw-bold">
                             Email (e.g. user@utb.ac.id)
                         </label>
-                        <input type="email" class="form-control" id="inputEmail" placeholder="Masukkan email Anda" required>
+                        <input type="email" class="form-control" id="inputEmail" placeholder="Masukkan email Anda"
+                            required>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label for="inputPassword" class="form-label text-light fw-bold">
                             Password (e.g. utsweb1)
                         </label>
-                        <input type="password" class="form-control" id="inputPassword" placeholder="Masukkan password Anda" required>
+                        <input type="password" class="form-control" id="inputPassword"
+                            placeholder="Masukkan password Anda" required>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="rememberMe">
-                                <label class="form-check-label fw-bold" for="rememberMe" style="color: #ffffff; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">
+                                <label class="form-check-label fw-bold" for="rememberMe"
+                                    style="color: #ffffff; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">
                                     Ingat saya
                                 </label>
                             </div>
                         </div>
                         <div class="col text-end">
-                            <a href="#" class="text-danger fw-bold text-decoration-none" style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px;">Lupa password?</a>
+                            <a href="#" class="text-danger fw-bold text-decoration-none"
+                                style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px;">Lupa
+                                password?</a>
                         </div>
                     </div>
 
@@ -69,25 +76,36 @@
                     </div>
 
                     <div class="text-center mt-4">
-                        <p class="fw-bold" style="color: #ffffff; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 6px; display: inline-block;">
-                            Belum punya akun? 
+                        <p class="fw-bold"
+                            style="color: #ffffff; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 6px; display: inline-block;">
+                            Belum punya akun?
                             <a href="register.html" class="text-danger fw-bold text-decoration-none">Daftar Sekarang</a>
                         </p>
                     </div>
                 </form>
 
                 <!-- Demo Credentials Info -->
-                <div class="alert alert-info mt-4" style="background: rgba(255, 255, 255, 0.95); border: 3px solid #17a2b8; border-radius: 10px;">
-                    <h6 class="text-dark fw-bold"><i class="fas fa-info-circle me-2 text-info"></i>Demo Login Account</h6>
-                    <div class="mt-2">
-                        <strong class="text-dark">Email:</strong> 
-                        <code class="bg-danger text-white px-2 py-1 rounded">user@utb.ac.id</code>
-                        <br>
-                        <strong class="text-dark">Password:</strong> 
-                        <code class="bg-danger text-white px-2 py-1 rounded">utsweb1</code>
+                <div class="alert alert-info mt-4"
+                    style="background: rgba(255, 255, 255, 0.95); border: 3px solid #17a2b8; border-radius: 10px;">
+                    <h6 class="text-dark fw-bold"><i class="fas fa-info-circle me-2 text-info"></i>Demo Login
+                        Credentials</h6>
+
+                    <!-- Admin -->
+                    <div class="mt-2 p-2 rounded" style="background: rgba(220, 53, 69, 0.1);">
+                        <span class="badge bg-danger me-2">ADMIN</span>
+                        <code class="text-dark">admin@garasifyy.com</code> /
+                        <code class="text-dark">admin123</code>
                     </div>
+
+                    <!-- Member -->
+                    <div class="mt-2 p-2 rounded" style="background: rgba(40, 167, 69, 0.1);">
+                        <span class="badge bg-success me-2">MEMBER</span>
+                        <code class="text-dark">user@utb.ac.id</code> /
+                        <code class="text-dark">utsweb1</code>
+                    </div>
+
                     <small class="text-muted d-block mt-2">
-                        <i class="fas fa-lightbulb me-1"></i>Gunakan kredensial di atas untuk testing login
+                        <i class="fas fa-lightbulb me-1"></i>Admin → Dashboard Admin | Member → Download App
                     </small>
                 </div>
             </div>
@@ -126,4 +144,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/script.js"></script>
 </body>
+
 </html>
