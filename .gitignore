@@ -33,4 +33,5 @@ garasifyy.nginx
 CHANGELOG.md
 
 # Screenshots (not needed for production)
-/screenshots
+# /screenshots -> Commented out to include in repo
+

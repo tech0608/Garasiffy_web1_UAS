@@ -151,17 +151,17 @@ Garasifyy_Web/
 ## 🎨 Screenshots
 
 ### Login Page
-Dark theme login dengan branding Garasifyy.
+![Login Page](screenshots/login.png)
+*Modifikasi login page dengan tema gelap dan branding Garasifyy.*
 
 ### Dashboard
-Overview dengan statistik:
-- Total Antrian
-- Proyek Aktif
-- Selesai Bulan Ini
-- Total Revenue
+![Dashboard Overview](screenshots/dashboard.png)
+*Overview dashboard dengan statistik realtime dan data antrian.*
 
 ### Manajemen Proyek
-Tabel proyek dengan progress bar, status badge, dan action buttons.
+![Create Service](screenshots/post-create-service.png)
+*Tampilan form dan manajemen data.*
+
 
 ---
 
