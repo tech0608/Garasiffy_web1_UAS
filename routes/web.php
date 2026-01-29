@@ -5,8 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('landing');
 });
+
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
