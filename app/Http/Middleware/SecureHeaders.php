@@ -23,6 +23,7 @@ class SecureHeaders
         $response->headers->set('Referrer-Policy', 'no-referrer-when-downgrade');
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         $response->headers->set('Content-Security-Policy', "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';");
+        $response->headers->remove('X-Powered-By');
 
         return $response;
     }

@@ -5,6 +5,17 @@
 
     RewriteEngine On
 
+    # Block Access to Sensitive Files
+    <FilesMatch "^\.(env|git|idea|vscode|.*)">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+
+    <FilesMatch "^(composer\.json|composer\.lock|package\.json|package-lock\.json|vite\.config\.js|start\.sh|deploy\.sh)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+
     # Handle Front Controller...
     RewriteCond %{REQUEST_URI} !(\/public\/)
     RewriteRule ^(.*)$ public/$1 [L]
