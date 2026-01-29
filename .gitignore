@@ -24,8 +24,13 @@ Homestead.yaml
 Thumbs.db
 
 # Firebase Service Account (secrets)
-*.json
-!package.json
-!package-lock.json
-!composer.json
 garasifyy-firebase-adminsdk-*.json
+
+# Excluded files for GitHub
+LAPORAN_ISMS.md
+deploy_update.ps1
+garasifyy.nginx
+CHANGELOG.md
+
+# Screenshots (not needed for production)
+/screenshots

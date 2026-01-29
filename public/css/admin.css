@@ -1,0 +1,339 @@
+/* Garasifyy Admin - Dark Automotive Theme */
+:root {
+    --bg-dark: #121212;
+    --bg-card: #1e1e2d;
+    --bg-sidebar: #0f0f13;
+    --primary-red: #d32f2f;
+    --accent-red: #ff3b30;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --border-color: #2c2c35;
+
+    /* Status Colors */
+    --status-queue: #3b82f6;
+    /* Blue */
+    --status-active: #eab308;
+    /* Yellow */
+    --status-done: #22c55e;
+    /* Green */
+    --status-rev: #ef4444;
+    /* Red */
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* --- Sidebar --- */
+#sidebar-wrapper {
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-heading {
+    background-color: var(--primary-red) !important;
+    color: white !important;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.list-group-item {
+    background-color: transparent !important;
+    color: var(--text-secondary) !important;
+    border: none !important;
+    padding: 15px 20px;
+    transition: all 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-primary) !important;
+    padding-left: 25px;
+    /* Slide effect */
+}
+
+.list-group-item.active {
+    background-color: rgba(211, 47, 47, 0.15) !important;
+    color: var(--accent-red) !important;
+    border-left: 4px solid var(--accent-red) !important;
+    font-weight: 600;
+}
+
+.list-group-item i {
+    width: 25px;
+    text-align: center;
+}
+
+/* --- Content Wrapper & Layout --- */
+#page-content-wrapper {
+    background-color: var(--bg-dark);
+    min-height: 100vh;
+    padding-top: 20px;
+}
+
+/* Desktop Layout Fix */
+@media (min-width: 992px) {
+    #sidebar-wrapper {
+        width: 250px;
+        position: fixed;
+        z-index: 1000;
+        height: 100vh;
+    }
+
+    #page-content-wrapper {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+}
+
+/* Mobile Layout Fix */
+@media (max-width: 991.98px) {
+    #sidebar-wrapper {
+        margin-left: -250px;
+        position: fixed;
+        z-index: 1000;
+        height: 100vh;
+        transition: margin 0.3s;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+/* --- Navigation Bar --- */
+.navbar {
+    background-color: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    box-shadow: none !important;
+}
+
+.navbar .btn-outline-light {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.navbar .btn-outline-light:hover {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: white;
+}
+
+/* --- Dashboard Cards (The "Berantakan" Fix) --- */
+/* Remove old rainbow backgrounds */
+.stat-card.bg-primary,
+.stat-card.bg-warning,
+.stat-card.bg-success,
+.stat-card.bg-danger {
+    background-color: var(--bg-card) !important;
+    /* Unified Dark BG */
+    border: 1px solid var(--border-color);
+}
+
+.stat-card {
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add colored accents via ::before or border-left */
+.stat-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+/* Specific Card Accents */
+/* 1. Total Antrian - Blue */
+.col-xl-3:nth-child(1) .stat-card::before {
+    background-color: var(--status-queue);
+}
+
+.col-xl-3:nth-child(1) .stat-card h2 {
+    color: var(--status-queue);
+}
+
+.col-xl-3:nth-child(1) .stat-card i {
+    color: var(--status-queue) !important;
+    opacity: 0.2 !important;
+}
+
+/* 2. Proyek Aktif - Yellow */
+.col-xl-3:nth-child(2) .stat-card::before {
+    background-color: var(--status-active);
+}
+
+.col-xl-3:nth-child(2) .stat-card h2 {
+    color: var(--status-active);
+}
+
+.col-xl-3:nth-child(2) .stat-card i {
+    color: var(--status-active) !important;
+    opacity: 0.2 !important;
+}
+
+/* 3. Selesai - Green */
+.col-xl-3:nth-child(3) .stat-card::before {
+    background-color: var(--status-done);
+}
+
+.col-xl-3:nth-child(3) .stat-card h2 {
+    color: var(--status-done);
+}
+
+.col-xl-3:nth-child(3) .stat-card i {
+    color: var(--status-done) !important;
+    opacity: 0.2 !important;
+}
+
+/* 4. Revenue - Red */
+.col-xl-3:nth-child(4) .stat-card::before {
+    background-color: var(--status-rev);
+}
+
+.col-xl-3:nth-child(4) .stat-card h2 {
+    color: var(--status-rev);
+}
+
+.col-xl-3:nth-child(4) .stat-card i {
+    color: var(--status-rev) !important;
+    opacity: 0.2 !important;
+}
+
+/* Text corrections for the cards */
+.stat-card h6 {
+    color: var(--text-secondary) !important;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.stat-card .card-body {
+    padding: 1.5rem;
+}
+
+/* --- Tables --- */
+.card.bg-dark {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color);
+    box-shadow: none !important;
+}
+
+.card-header.bg-danger {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem 1.5rem;
+}
+
+.card-header h5 {
+    color: var(--primary-red);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 1rem;
+}
+
+.table-dark {
+    background-color: transparent !important;
+    --bs-table-bg: transparent;
+    color: var(--text-secondary);
+}
+
+.table-dark thead th {
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding-bottom: 1rem;
+}
+
+.table-dark td {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0.5rem;
+    color: var(--text-primary);
+}
+
+.table-hover tbody tr:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* --- Badges & Progress --- */
+.badge {
+    padding: 0.5em 1em;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.bg-success {
+    background-color: rgba(34, 197, 94, 0.2) !important;
+    color: #22c55e;
+}
+
+.bg-warning {
+    background-color: rgba(234, 179, 8, 0.2) !important;
+    color: #eab308;
+}
+
+.bg-info {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+    color: #3b82f6;
+}
+
+/* Used for planning/other */
+.bg-secondary {
+    background-color: rgba(160, 160, 160, 0.2) !important;
+    color: #a0a0a0;
+}
+
+.progress {
+    background-color: var(--border-color);
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+/* --- Title --- */
+h2.text-gradient {
+    background: none;
+    -webkit-text-fill-color: initial;
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    border-left: 5px solid var(--primary-red);
+    padding-left: 15px;
+}
+
+/* --- Modals --- */
+.modal-content {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}

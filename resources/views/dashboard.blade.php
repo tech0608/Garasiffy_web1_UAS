@@ -1,16 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Garasifyy Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Firebase Web SDK -->
+    <title>Admin Dashboard | Garasifyy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- jsPDF for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <!-- FileSaver.js for reliable file downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <!-- Firebase SDK - Connected to same database as mobile app -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, query, onSnapshot, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        
+        import { getFirestore, collection, query, onSnapshot, orderBy, doc, updateDoc, addDoc, deleteDoc, getDocs, getDoc, where, setDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration - SAME AS MOBILE APP PROJECT
         const firebaseConfig = {
             apiKey: "AIzaSyCOaRCFiH--lrTQgaTdh-6HyqM0_DY2DB4",
             authDomain: "garasifyy.firebaseapp.com",
@@ -20,237 +32,530 @@
             appId: "1:189603872814:web:65708c604ad6e9ee1ddfbf",
             measurementId: "G-JH69VW685Y"
         };
-        
+
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        
-        // Real-time listener for projects
-        const projectsQuery = query(collection(db, 'projects'), orderBy('updatedAt', 'desc'));
-        
-        onSnapshot(projectsQuery, (snapshot) => {
-            const projects = [];
-            snapshot.forEach((doc) => {
-                projects.push({ id: doc.id, ...doc.data() });
-            });
-            
-            // Update stats
-            const totalProjects = projects.length;
-            const activeProjects = projects.filter(p => p.status === 'waiting' || p.status === 'on_progress').length;
-            const completedProjects = projects.filter(p => p.status === 'completed').length;
-            const totalRevenue = projects.reduce((sum, p) => sum + (p.totalCost || 0), 0);
-            
-            document.getElementById('stat-total').textContent = totalProjects;
-            document.getElementById('stat-revenue').textContent = 'Rp ' + (totalRevenue / 1000000).toFixed(1) + ' Jt';
-            document.getElementById('stat-pending').textContent = activeProjects;
-            
-            // Update table
-            const tbody = document.getElementById('projects-table-body');
-            if (projects.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-500">No active projects found. Data loaded from Firebase Firestore (Real-time)</td></tr>';
-            } else {
-                tbody.innerHTML = projects.map(project => {
-                    const statusClass = project.status === 'waiting' ? 'status-waiting' : 
-                                       project.status === 'on_progress' ? 'status-on_progress' : 
-                                       'status-completed';
-                    const bookingDate = project.bookingDate?.toDate ? project.bookingDate.toDate().toLocaleDateString('id-ID') : 'N/A';
-                    
-                    return `
-                        <tr class="table-row transition">
-                            <td class="p-4">
-                                <div class="font-medium text-white">${project.carModel || 'N/A'}</div>
-                                <div class="text-xs text-gray-500">${project.plateNumber || 'N/A'}</div>
-                            </td>
-                            <td class="p-4 text-gray-300">${project.serviceType || 'N/A'}</td>
-                            <td class="p-4 text-gray-300">${bookingDate}</td>
-                            <td class="p-4">
-                                <span class="status-badge ${statusClass}">
-                                    ${(project.status || 'unknown').toUpperCase().replace('_', ' ')}
-                                </span>
-                            </td>
-                            <td class="p-4 text-gray-300">Rp ${(project.totalCost || 0).toLocaleString('id-ID')}</td>
-                            <td class="p-4 text-center">
-                                <button class="text-gray-400 hover:text-white mx-1">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            }
-        });
+
+        console.log('🔥 Firebase connected to project: garasifyy (same as mobile app)');
+
+        // Make Firebase available globally for admin.js
+        window.firebaseDb = db;
+        window.firebaseModules = { collection, query, onSnapshot, orderBy, doc, updateDoc, addDoc, deleteDoc, getDocs, getDoc, where, setDoc, Timestamp };
+
+        // Notify that Firebase is ready
+        window.dispatchEvent(new Event('firebase-ready'));
     </script>
-    
-    <style>
-        body { background-color: #0d1117; color: white; }
-        .sidebar { background-color: #161b22; border-right: 1px solid #30363d; }
-        .header { background-color: #161b22; border-bottom: 1px solid #30363d; }
-        .card { background-color: #161b22; border: 1px solid #30363d; }
-        .table-header { background-color: #21262d; }
-        .table-row:hover { background-color: #21262d; }
-        .status-badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-        .status-waiting { background-color: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.5); }
-        .status-on_progress { background-color: rgba(13, 110, 253, 0.2); color: #0d6efd; border: 1px solid rgba(13, 110, 253, 0.5); }
-        .status-completed { background-color: rgba(25, 135, 84, 0.2); color: #198754; border: 1px solid rgba(25, 135, 84, 0.5); }
-    </style>
 </head>
-<body class="flex h-screen">
 
-    <!-- Sidebar -->
-    <div class="sidebar w-64 flex flex-col hidden md:flex">
-        <div class="p-6">
-            <h1 class="text-2xl font-bold text-red-500 tracking-wider">GARASIFYY</h1>
-            <p class="text-xs text-gray-500 mt-1">Admin Panel</p>
-        </div>
-        <nav class="flex-1 px-4 py-4 space-y-2">
-            <a href="#" class="flex items-center px-4 py-3 bg-red-900/20 text-red-500 rounded-lg">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                Dashboard
-            </a>
-            <a href="#" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                Customers
-            </a>
-            <a href="#" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Invoices
-            </a>
-        </nav>
-        <div class="p-4 border-t border-gray-800">
-            <a href="{{ route('logout') }}" class="flex items-center px-4 py-2 text-gray-500 hover:text-white transition">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                Logout
-            </a>
-        </div>
-    </div>
+<body class="admin-body">
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Header -->
-        <header class="header flex items-center justify-between p-6">
-            <h2 class="text-xl font-semibold">Project Overview</h2>
-            <div class="flex items-center space-x-4">
-                <div class="text-right mr-2">
-                    <p class="text-sm font-bold text-white">Admin</p>
-                    <p class="text-xs text-gray-500">Super Administrator</p>
-                </div>
-                <div class="h-10 w-10 rounded-full bg-red-600 flex items-center justify-center text-white font-bold">
-                    A
-                </div>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="admin-sidebar" id="sidebar-wrapper">
+            <div
+                class="sidebar-heading bg-danger text-white p-3 fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-cogs me-2"></i>Admin Garasifyy</span>
+                <button type="button" class="btn btn-sm btn-outline-light d-lg-none" id="sidebarClose">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        </header>
-
-        <!-- Content -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-dark p-6">
-            <!-- Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="card p-6 rounded-xl">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-gray-400 text-sm font-medium">TOTAL PROJECTS</h3>
-                        <span class="p-2 bg-blue-500/10 text-blue-500 rounded-lg">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                        </span>
-                    </div>
-                    <div class="text-3xl font-bold mb-1" id="stat-total">{{ count($projects ?? []) }}</div>
-                    <div class="text-xs text-green-500 font-medium flex items-center">
-                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        +12% from last month
-                    </div>
-                </div>
-
-                <div class="card p-6 rounded-xl">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-gray-400 text-sm font-medium">REVENUE</h3>
-                        <span class="p-2 bg-green-500/10 text-green-500 rounded-lg">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </span>
-                    </div>
-                    <div class="text-3xl font-bold mb-1" id="stat-revenue">Rp 0 Jt</div>
-                    <div class="text-xs text-green-500 font-medium flex items-center">
-                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        +8.1% from last month
-                    </div>
-                </div>
-
-                <div class="card p-6 rounded-xl">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-gray-400 text-sm font-medium">PENDING ORDERS</h3>
-                        <span class="p-2 bg-yellow-500/10 text-yellow-500 rounded-lg">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </span>
-                    </div>
-                    <div class="text-3xl font-bold mb-1" id="stat-pending">0</div>
-                    <div class="text-xs text-gray-500 font-medium">
-                        Requires attention
-                    </div>
-                </div>
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action py-3 active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-3" data-section="queue">
+                    <i class="fas fa-users me-2"></i>Antrian <span class="badge bg-danger ms-2" id="queueBadge">5</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-3" data-section="projects">
+                    <i class="fas fa-project-diagram me-2"></i>Proyek
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-3" data-section="services">
+                    <i class="fas fa-tools me-2"></i>Layanan & Harga
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-3" data-section="packages">
+                    <i class="fas fa-box me-2"></i>Paket
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-3" data-section="reports">
+                    <i class="fas fa-chart-bar me-2"></i>Laporan
+                </a>
+                <a href="{{ route('logout') }}" class="list-group-item list-group-item-action py-3 text-danger" id="adminLogoutBtn">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
             </div>
+        </div>
 
-            <!-- Table -->
-            <div class="card rounded-xl overflow-hidden">
-                <div class="p-6 border-b border-gray-800 flex justify-between items-center">
-                    <h3 class="font-bold text-lg">Active Projects</h3>
-                    <button class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition">
-                        + Manual Booking
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="flex-grow-1">
+            <!-- Top Navigation -->
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom shadow-sm">
+                <div class="container-fluid">
+                    <button class="btn btn-outline-light me-3" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
                     </button>
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-user-shield text-danger me-2"></i>
+                        Admin Panel
+                    </h5>
+                        <span class="nav-link text-light dropdown-toggle" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            <span id="adminEmail">admin@garasifyy.com</span>
+                        </span>
+                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" onclick="showChangePasswordModal()"><i class="fas fa-key me-2"></i>Ganti Password</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="table-header text-left">
-                            <tr>
-                                <th class="p-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Customer / Car</th>
-                                <th class="p-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Service</th>
-                                <th class="p-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
-                                <th class="p-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                                <th class="p-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Cost</th>
-                                <th class="p-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-800" id="projects-table-body">
-                            @forelse($projects as $project)
-                            <tr class="table-row transition">
-                                <td class="p-4">
-                                    <div class="font-medium text-white">{{ $project['carModel'] }}</div>
-                                    <div class="text-xs text-gray-500">{{ $project['plateNumber'] }}</div>
-                                </td>
-                                <td class="p-4 text-gray-300">{{ $project['serviceType'] }}</td>
-                                <td class="p-4 text-gray-300">
-                                    {{ is_string($project['bookingDate']) ? $project['bookingDate'] : $project['bookingDate']->format('d M Y') }}
-                                </td>
-                                <td class="p-4">
-                                    @php
-                                        $statusClass = match($project['status']) {
-                                            'waiting' => 'status-waiting',
-                                            'on_progress' => 'status-on_progress',
-                                            'completed' => 'status-completed',
-                                            default => 'bg-gray-700 text-gray-300'
-                                        };
-                                    @endphp
-                                    <span class="status-badge {{ $statusClass }}">
-                                        {{ strtoupper(str_replace('_', ' ', $project['status'])) }}
-                                    </span>
-                                </td>
-                                <td class="p-4 text-gray-300">
-                                    Rp {{ number_format($project['totalCost'], 0, ',', '.') }}
-                                </td>
-                                <td class="p-4 text-center">
-                                    <button class="text-gray-400 hover:text-white mx-1">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                    </button>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="6" class="p-8 text-center text-gray-500">
-                                    No active projects found.
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+            </nav>
+
+            <!-- Main Content -->
+            <div class="container-fluid p-4">
+
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section">
+                    <h2 class="fw-bold text-gradient mb-4"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Overview
+                    </h2>
+
+                    <!-- Stats Cards -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-uppercase mb-1 opacity-75">Total Antrian</h6>
+                                            <h2 class="mb-0 fw-bold" id="totalQueue">{{ $stats['totalAntrian'] ?? 0 }}</h2>
+                                        </div>
+                                        <i class="fas fa-users fa-3x opacity-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card bg-warning text-dark">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-uppercase mb-1 opacity-75">Proyek Aktif</h6>
+                                            <h2 class="mb-0 fw-bold" id="activeProjects">{{ $stats['proyekAktif'] ?? 0 }}</h2>
+                                        </div>
+                                        <i class="fas fa-wrench fa-3x opacity-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-uppercase mb-1 opacity-75">Selesai Bulan Ini</h6>
+                                            <h2 class="mb-0 fw-bold" id="completedProjects">{{ $stats['selesaiBulan'] ?? 0 }}</h2>
+                                        </div>
+                                        <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card bg-danger text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-uppercase mb-1 opacity-75">Revenue</h6>
+                                            <h2 class="mb-0 fw-bold" id="totalRevenue">Rp {{ number_format($stats['revenue'] ?? 0, 0, ',', '.') }}</h2>
+                                        </div>
+                                        <i class="fas fa-money-bill-wave fa-3x opacity-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Projects Table -->
+                    <div class="card bg-dark text-light shadow">
+                        <div class="card-header bg-danger">
+                            <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Proyek Terbaru</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover" id="recentProjectsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Customer</th>
+                                            <th>Kendaraan</th>
+                                            <th>Layanan</th>
+                                            <th>Status</th>
+                                            <th>Progress</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($projects as $project)
+                                        <tr>
+                                            <td>#{{ $project['id'] ?? '-' }}</td>
+                                            <td>{{ $project['customer'] ?? '-' }}</td>
+                                            <td>{{ $project['carModel'] ?? '-' }}</td>
+                                            <td>{{ $project['serviceType'] ?? '-' }}</td>
+                                            <td>
+                                                @php
+                                                    $status = $project['status'] ?? 'planning';
+                                                    $badgeClass = match(strtolower($status)) {
+                                                        'completed', 'selesai' => 'bg-success',
+                                                        'on progress', 'dikerjakan' => 'bg-warning',
+                                                        'waiting', 'menunggu' => 'bg-secondary',
+                                                        default => 'bg-info'
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $badgeClass }}">{{ ucfirst($status) }}</span>
+                                            </td>
+                                            <td>
+                                                @php $progress = $project['progress'] ?? 0; @endphp
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar {{ $badgeClass }}" style="width: {{ $progress }}%"></div>
+                                                </div>
+                                                <small>{{ $progress }}%</small>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-light" onclick="viewProject('{{ $project['id'] }}')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-success" onclick="updateStatus('{{ $project['id'] }}')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center">Belum ada data proyek dari Firebase.</td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Queue Section -->
+                <div id="queue-section" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold text-gradient"><i class="fas fa-users me-2"></i>Manajemen Antrian</h2>
+                        <div>
+                            <select class="form-select form-select-sm d-inline-block w-auto me-2" id="queueFilter">
+                                <option value="all">Semua Status</option>
+                                <option value="waiting">Menunggu</option>
+                                <option value="in-progress">Dikerjakan</option>
+                                <option value="completed">Selesai</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="card bg-dark text-light shadow">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover" id="queueTable">
+                                    <thead>
+                                        <tr>
+                                            <th>No. Antrian</th>
+                                            <th>Customer</th>
+                                            <th>No. Plat</th>
+                                            <th>Layanan</th>
+                                            <th>Tanggal Booking</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="queueTableBody">
+                                        <!-- Populated via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Section -->
+                <div id="projects-section" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold text-gradient"><i class="fas fa-project-diagram me-2"></i>Manajemen Proyek
+                        </h2>
+                    </div>
+
+                    <div class="card bg-dark text-light shadow">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover" id="projectsTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-nowrap">ID Proyek</th>
+                                            <th class="text-nowrap">Layanan - Kendaraan</th>
+                                            <th class="text-nowrap">Customer</th>
+                                            <th class="text-nowrap">Progress</th>
+                                            <th class="text-nowrap">Status</th>
+                                            <th class="text-end text-nowrap">Total</th>
+                                            <th class="text-nowrap">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="projectsTableBody">
+                                        <!-- Populated via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Services Section -->
+                <div id="services-section" class="content-section d-none">
+                    <!-- Services content populated via JS or Static -->
+                     <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold text-gradient"><i class="fas fa-tools me-2"></i>Pengaturan Layanan & Harga
+                        </h2>
+                        <button class="btn btn-danger" onclick="showAddServiceModal()">
+                            <i class="fas fa-plus me-2"></i>Tambah Layanan
+                        </button>
+                    </div>
+                    <div class="row g-4">
+                         <!-- Content placeholder maintained from source -->
+                    </div>
+                </div>
+
+                <!-- Packages Section -->
+                <div id="packages-section" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold text-gradient"><i class="fas fa-box me-2"></i>Paket Upgrade & Maintenance
+                        </h2>
+                        <button class="btn btn-danger" onclick="showAddPackageModal()">
+                            <i class="fas fa-plus me-2"></i>Tambah Paket
+                        </button>
+                    </div>
+                    <div class="row g-4" id="packagesContainer">
+                        <!-- Packages populated via JS or Static -->
+                    </div>
+                </div>
+
+                <!-- Reports Section -->
+                <div id="reports-section" class="content-section d-none">
+                    <!-- Reports UI maintained -->
+                     <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold text-gradient"><i class="fas fa-chart-bar me-2"></i>Laporan & Export</h2>
+                    </div>
+                     <!-- Report Filters -->
+                    <div class="card bg-dark text-light shadow mb-4">
+                        <div class="card-header bg-danger">
+                            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Laporan</h5>
+                        </div>
+                        <div class="card-body">
+                             <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Tanggal Mulai</label>
+                                    <input type="date" class="form-control bg-dark text-light" id="reportStartDate">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Tanggal Akhir</label>
+                                    <input type="date" class="form-control bg-dark text-light" id="reportEndDate">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select bg-dark text-light" id="reportStatus">
+                                        <option value="all">Semua Status</option>
+                                        <option value="completed">Selesai</option>
+                                        <option value="in-progress">Dikerjakan</option>
+                                        <option value="planning">Planning</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Jenis Laporan</label>
+                                    <select class="form-select bg-dark text-light" id="reportType">
+                                        <option value="projects">Proyek</option>
+                                        <option value="revenue">Revenue</option>
+                                        <option value="queue">Antrian</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-danger" onclick="generateReport()">
+                                    <i class="fas fa-search me-2"></i>Generate Laporan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
+    <!-- Update Status Modal -->
+    <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-danger fw-bold"><i class="fas fa-edit me-2"></i>Update Status Proyek</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editProjectId">
+                    <input type="hidden" id="editCollectionName">
+                    
+                    <div class="mb-3">
+                        <label for="editStatusSelect" class="form-label text-secondary small text-uppercase">Status Pengerjaan</label>
+                        <select class="form-select bg-dark text-white border-secondary" id="editStatusSelect">
+                            <option value="waiting">Menunggu (Pending)</option>
+                            <option value="process">Sedang Dikerjakan (On Progress)</option>
+                            <option value="waiting_payment">Menunggu Pembayaran (Invoice Sent)</option>
+                            <option value="completed">Selesai (Completed)</option>
+                            <option value="canceled">Dibatalkan</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="editProgress" class="form-label text-secondary small text-uppercase">Progress (%)</label>
+                        <input type="range" class="form-range" id="editProgress" min="0" max="100" step="5" oninput="document.getElementById('progressValue').innerText = this.value + '%'">
+                        <div class="text-end fw-bold text-danger" id="progressValue">0%</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmUpdateStatus()">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-success fw-bold"><i class="fas fa-file-invoice-dollar me-2"></i>Kirim Invoice</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-paper-plane fa-3x text-success mb-3"></i>
+                        <p>Kirim tagihan pembayaran ke pelanggan untuk proyek ini?</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="invoiceAmount" class="form-label text-light">Jumlah Tagihan (Rp)</label>
+                        <input type="number" class="form-control bg-dark text-white border-secondary" id="invoiceAmount" placeholder="Contoh: 1500000">
+                    </div>
+                    
+                    <small class="text-muted d-block text-center">Status akan berubah menjadi <strong>"Menunggu Pembayaran"</strong>.</small>
+                    <input type="hidden" id="invoiceProjectId">
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success" onclick="confirmSendInvoice()">Kirim Invoice</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Service Modal -->
+    <div class="modal fade" id="addServiceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-danger fw-bold"><i class="fas fa-tools me-2"></i>Tambah Layanan Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="newServiceName" class="form-label">Nama Layanan</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" id="newServiceName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newServiceDesc" class="form-label">Deskripsi</label>
+                        <textarea class="form-control bg-dark text-white border-secondary" id="newServiceDesc" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newServicePrice" class="form-label">Harga (Rp)</label>
+                        <input type="number" class="form-control bg-dark text-white border-secondary" id="newServicePrice" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" onclick="saveNewService()">Simpan Layanan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-warning fw-bold"><i class="fas fa-key me-2"></i>Ganti Password Admin</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Password Saat Ini</label>
+                        <input type="password" class="form-control bg-dark text-white border-secondary" id="currentPassword">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Password Baru</label>
+                        <input type="password" class="form-control bg-dark text-white border-secondary" id="newPassword">
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmNewPassword" class="form-label">Konfirmasi Password Baru</label>
+                        <input type="password" class="form-control bg-dark text-white border-secondary" id="confirmNewPassword">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-warning text-dark" onclick="confirmChangePassword()">Update Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="projectDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title"><i class="fas fa-car me-2"></i>Detail Proyek</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Standard Modal Content -->
+                     <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-danger mb-3"><i class="fas fa-user me-2"></i>Informasi Customer</h6>
+                            <p><strong>Nama:</strong> <span id="detailCustomerName">-</span></p>
+                            <p><strong>Email:</strong> <span id="detailCustomerEmail">-</span></p>
+                            <p><strong>Telepon:</strong> <span id="detailCustomerPhone">-</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-danger mb-3"><i class="fas fa-car me-2"></i>Informasi Kendaraan</h6>
+                            <p><strong>Model:</strong> <span id="detailCarModel">-</span></p>
+                            <p><strong>Plat:</strong> <span id="detailCarPlate">-</span></p>
+                            <p><strong>Tahun:</strong> <span id="detailCarYear">-</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-custom">
+        <div class="container">
+            <p class="mb-0 small">@Copyright by 23552011045_Luthfy Arief_TIF_RP_23_CNS_A | Garasifyy Admin Panel</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/admin.js') }}"></script>
 </body>
+
 </html>

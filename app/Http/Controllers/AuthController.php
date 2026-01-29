@@ -3,36 +3,142 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Kreait\Firebase\Contract\Auth;
-use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
+use Google\Auth\Credentials\ServiceAccountCredentials;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    /**
+     * Show login page
+     */
     public function showLogin()
     {
+        // Redirect to dashboard if already logged in
+        if (session('user_id')) {
+            return redirect()->route('dashboard');
+        }
+        
         return view('login');
     }
 
+    /**
+     * Handle login request
+     */
     public function login(Request $request)
     {
-        // Simple manual login for Admin (Hardcoded for UAS simplicity, or verify via Firebase)
-        // For this demo: Check if email is 'admin@garasifyy.com' and password 'admin123'
-        
+        // Validate input
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6'
+        ]);
+
         $email = $request->input('email');
         $password = $request->input('password');
 
-        if ($email === 'admin@garasifyy.com' && $password === 'admin123') {
+        // Get credentials from Firestore or use defaults
+        $credentials = $this->getAuthCredentials();
+
+        // Validate credentials
+        if ($email === $credentials['email'] && $password === $credentials['password']) {
             session(['user_id' => 'admin']);
             session(['role' => 'admin']);
+            session(['email' => $email]);
+            
+            Log::info("Admin login successful: {$email}");
+            
             return redirect()->route('dashboard');
         }
 
-        return back()->with('error', 'Invalid credentials');
+        Log::warning("Failed login attempt for: {$email}");
+        
+        return back()
+            ->withInput(['email' => $email])
+            ->with('error', 'Email atau password salah');
     }
 
+    /**
+     * Get authentication credentials from Firestore
+     */
+    private function getAuthCredentials(): array
+    {
+        // Default credentials (fallback)
+        $defaultCredentials = [
+            'email' => 'admin@garasifyy.com',
+            'password' => 'garasi2515'
+        ];
+
+        $accessToken = $this->getFirebaseAccessToken();
+        
+        if (!$accessToken) {
+            return $defaultCredentials;
+        }
+
+        try {
+            $projectId = 'garasifyy';
+            $url = "https://firestore.googleapis.com/v1/projects/{$projectId}/databases/(default)/documents/config/auth";
+            
+            $response = Http::withToken($accessToken)
+                ->timeout(10)
+                ->get($url);
+
+            if ($response->successful()) {
+                $fields = $response->json()['fields'] ?? [];
+                
+                return [
+                    'email' => $fields['email']['stringValue'] ?? $defaultCredentials['email'],
+                    'password' => $fields['password']['stringValue'] ?? $defaultCredentials['password']
+                ];
+            }
+            
+            Log::warning("Firestore Auth Config not found, using defaults");
+            
+        } catch (\Exception $e) {
+            Log::error("Error fetching auth config: " . $e->getMessage());
+        }
+
+        return $defaultCredentials;
+    }
+
+    /**
+     * Get Firebase access token with caching
+     */
+    private function getFirebaseAccessToken(): ?string
+    {
+        $serviceAccountPath = base_path('garasifyy-firebase-adminsdk-fbsvc-d5bddf5452.json');
+
+        if (!file_exists($serviceAccountPath)) {
+            return null;
+        }
+
+        try {
+            // Cache token for 50 minutes (expires in 60)
+            return Cache::remember('firebase_access_token', 3000, function () use ($serviceAccountPath) {
+                $credentials = new ServiceAccountCredentials(
+                    ['https://www.googleapis.com/auth/datastore'],
+                    $serviceAccountPath
+                );
+                return $credentials->fetchAuthToken()['access_token'];
+            });
+        } catch (\Exception $e) {
+            Log::error("Auth Token Error: " . $e->getMessage());
+            Cache::forget('firebase_access_token');
+            return null;
+        }
+    }
+
+    /**
+     * Handle logout
+     */
     public function logout()
     {
+        $email = session('email', 'unknown');
+        
         session()->flush();
-        return redirect()->route('login');
+        
+        Log::info("Admin logout: {$email}");
+        
+        return redirect()->route('login')->with('success', 'Anda telah keluar dari sistem');
     }
 }

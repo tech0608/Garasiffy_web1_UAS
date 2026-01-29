@@ -1,262 +1,203 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/Garasiffy-Premium%20Car%20Modification-FF4500?style=for-the-badge&logo=car&logoColor=white" alt="Garasiffy Badge">
-</p>
+# 🚗 Garasifyy Admin Panel
 
-<h1 align="center">🚗 Garasiffy - Web Admin Panel</h1>
+> **Car Modification Management System**
+> 
+> Admin panel berbasis Laravel untuk mengelola layanan modifikasi mobil dengan integrasi Firebase Firestore.
 
-<p align="center">
-  <strong>Sistem Manajemen Bengkel Modifikasi Digital</strong><br>
-  Admin Panel berbasis Laravel untuk mengelola operasional bengkel modifikasi kendaraan
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat-square&logo=laravel" alt="Laravel">
-  <img src="https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat-square&logo=php" alt="PHP">
-  <img src="https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=flat-square&logo=firebase" alt="Firebase">
-  <img src="https://img.shields.io/badge/Node.js-API-339933?style=flat-square&logo=nodedotjs" alt="Node.js">
-  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-12.x-red?logo=laravel)
+![PHP](https://img.shields.io/badge/PHP-8.2+-blue?logo=php)
+![Firebase](https://img.shields.io/badge/Firebase-Firestore-orange?logo=firebase)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple?logo=bootstrap)
 
 ---
 
-## 📋 Tentang Proyek
+## 📋 Deskripsi
 
-**Garasiffy Web Admin Panel** adalah aplikasi backend berbasis Laravel yang digunakan untuk mengelola operasional bengkel modifikasi kendaraan. Proyek ini merupakan bagian dari ekosistem Garasiffy yang mencakup aplikasi mobile dan web untuk konsumen.
+Garasifyy adalah sistem manajemen untuk bengkel modifikasi mobil yang memungkinkan admin untuk:
 
-Referensi proyek: [Garasiffy_project](https://github.com/tech0608/Garasiffy_project)
-
-### 🎯 Tujuan Aplikasi
-
-- ✅ Mengelola antrian kendaraan dengan sistematis
-- ✅ Memantau progress pekerjaan setiap mekanik
-- ✅ Mengalokasikan resources (mekanik, peralatan) dengan efisien
-- ✅ Memberikan transparansi kepada konsumen
-- ✅ Menghasilkan laporan dan analytics untuk business insights
+- 📊 **Dashboard** - Melihat statistik proyek, antrian, dan revenue
+- 👥 **Manajemen Antrian** - Kelola antrian pelanggan yang booking
+- 🔧 **Manajemen Proyek** - Track progress pengerjaan modifikasi
+- 💰 **Layanan & Harga** - Kelola daftar layanan dan harga
+- 📦 **Paket** - Kelola paket upgrade dan maintenance
+- 📈 **Laporan** - Generate laporan dan export data
 
 ---
 
-## 🛠️ Tech Stack
+## 🔧 Teknologi
 
-| Teknologi | Versi | Keterangan |
-|-----------|-------|------------|
-| **Laravel** | 12.x | PHP Framework untuk backend |
-| **PHP** | 8.2+ | Server-side programming |
-| **Firebase Firestore** | - | NoSQL Database |
-| **Node.js** | - | REST API Server |
-| **Express.js** | - | Node.js Framework |
-| **Vite** | - | Build tool untuk assets |
-
----
-
-## 🔐 Fitur Autentikasi
-
-### Auth Login menggunakan Cookies
-
-Sistem autentikasi menggunakan **Session-based Authentication** dengan penyimpanan cookies:
-
-```php
-// Login berhasil - menyimpan session ke cookies
-session(['user_id' => 'admin']);
-session(['role' => 'admin']);
-
-// Logout - menghapus semua session
-session()->flush();
-```
-
-**Alur Autentikasi:**
-
-1. User mengakses halaman login (`/login`)
-2. User memasukkan email dan password
-3. Sistem memvalidasi kredensial
-4. Jika valid, session disimpan di cookies
-5. User diarahkan ke dashboard
-6. Setiap request, middleware mengecek session dari cookies
-
-**Kredensial Default Admin:**
-- Email: `admin@garasifyy.com`
-- Password: `admin123`
-
-**Rute Autentikasi:**
-
-| Method | Route | Fungsi |
-|--------|-------|--------|
-| GET | `/login` | Menampilkan halaman login |
-| POST | `/login` | Proses autentikasi |
-| GET | `/logout` | Logout dan hapus session |
-| GET | `/dashboard` | Halaman dashboard (protected) |
+| Layer | Teknologi |
+|-------|-----------|
+| Backend | Laravel 12.x, PHP 8.2+ |
+| Database | Firebase Firestore |
+| Frontend | Bootstrap 5.3, Font Awesome 6 |
+| Authentication | Session-based dengan Firebase config |
+| Build Tool | Vite |
 
 ---
 
-## 📊 CRUD Data
+## 🚀 Instalasi
 
-### Entitas Data yang Dikelola
-
-#### 1. **Projects (Proyek Modifikasi)**
-```
-├── id           : String (unique identifier)
-├── serviceType  : String (jenis layanan)
-├── plateNumber  : String (nomor plat kendaraan)
-├── carModel     : String (model kendaraan)
-├── status       : Enum ['waiting', 'on_progress', 'completed']
-├── bookingDate  : DateTime
-└── totalCost    : Number (biaya total)
-```
-
-#### 2. **Services (Layanan)**
-- Engine Upgrade - Modifikasi mesin dan performa
-- Body Paint - Pengecatan bodi kendaraan
-- Interior - Modifikasi interior
-- Audio - Instalasi sistem audio
-- Exterior - Modifikasi eksterior
-
-#### 3. **Customers (Pelanggan)**
-- Data customer dengan riwayat transaksi
-
-#### 4. **Cars (Kendaraan)**
-- Data kendaraan yang terdaftar dalam sistem
-
-### API Endpoints (Node.js Server)
-
-| Endpoint | Method | Deskripsi |
-|----------|--------|-----------|
-| `/api/auth/*` | - | Autentikasi user |
-| `/api/projects/*` | CRUD | Manajemen proyek |
-| `/api/services/*` | CRUD | Manajemen layanan |
-| `/api/customers/*` | CRUD | Manajemen pelanggan |
-| `/api/cars/*` | CRUD | Manajemen kendaraan |
-
----
-
-## 🚀 Instalasi & Setup
-
-### Prasyarat
+### Prerequisites
 
 - PHP >= 8.2
 - Composer
 - Node.js & NPM
-- Firebase Account (untuk Firestore)
+- Firebase Project dengan Firestore enabled
 
-### Langkah Instalasi
+### Setup
 
-1. **Clone Repository**
+1. **Clone repository**
    ```bash
-   git clone <repository-url>
-   cd Garasifyy_Web
+   git clone https://github.com/tech0608/Garasiffy_web1_UAS.git
+   cd Garasiffy_web1_UAS
    ```
 
-2. **Install Dependensi PHP**
+2. **Install dependencies**
    ```bash
    composer install
-   ```
-
-3. **Install Dependensi Node.js**
-   ```bash
    npm install
    ```
 
-4. **Setup Environment**
+3. **Environment setup**
    ```bash
    cp .env.example .env
    php artisan key:generate
    ```
 
-5. **Konfigurasi Firebase**
-   - Letakkan file service account JSON di root project
-   - Update nama file di `AdminController.php`
+4. **Firebase Configuration**
+   
+   Letakkan file service account Firebase di root project:
+   ```
+   garasifyy-firebase-adminsdk-xxxxx.json
+   ```
+   
+   > ⚠️ **Penting**: File ini tidak di-commit ke repository. Download dari Firebase Console.
 
-6. **Jalankan Development Server**
+5. **Build assets**
    ```bash
-   # Laravel
-   php artisan serve
-   
-   # Vite (untuk assets)
-   npm run dev
-   
-   # API Server (opsional)
-   cd api && node server.js
+   npm run build
    ```
 
-### Quick Setup (Composer Script)
-```bash
-composer run setup
-composer run dev
+6. **Run server**
+   ```bash
+   php artisan serve
+   ```
+
+7. **Akses aplikasi**
+   ```
+   http://localhost:8000
+   ```
+
+---
+
+## 🔐 Konfigurasi Firebase
+
+### Firestore Collections
+
+Aplikasi menggunakan collections berikut:
+
+| Collection | Deskripsi |
+|------------|-----------|
+| `projects` | Data proyek modifikasi |
+| `bookings` | Data antrian/booking pelanggan |
+| `services` | Daftar layanan dan harga |
+| `packages` | Paket upgrade dan maintenance |
+| `config/auth` | Kredensial admin |
+
+### Security Rules
+
+Pastikan Firestore rules dikonfigurasi untuk mengizinkan akses dari service account:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
 ```
 
 ---
 
-## 📁 Struktur Proyek
+## 📁 Struktur Project
 
 ```
 Garasifyy_Web/
 ├── app/
-│   ├── Http/
-│   │   └── Controllers/
-│   │       ├── AuthController.php    # Autentikasi
-│   │       └── AdminController.php   # Dashboard & CRUD
-│   └── Models/
-├── api/                              # Node.js API Server
-│   ├── routes/
-│   │   ├── auth.js                   # Auth routes
-│   │   ├── projects.js               # Projects CRUD
-│   │   ├── services.js               # Services CRUD
-│   │   ├── customers.js              # Customers CRUD
-│   │   └── cars.js                   # Cars CRUD
-│   └── server.js                     # Express server
+│   ├── Http/Controllers/
+│   │   ├── AdminController.php    # Dashboard & data management
+│   │   └── AuthController.php     # Login/Logout handling
+│   └── ...
 ├── resources/
 │   └── views/
-│       ├── login.blade.php
-│       └── dashboard.blade.php
-├── routes/
-│   └── web.php                       # Web routes
-├── config/
+│       ├── dashboard.blade.php    # Admin dashboard
+│       └── login.blade.php        # Login page
 ├── public/
+│   ├── css/
+│   │   ├── style.css              # Global styles
+│   │   └── admin.css              # Admin panel theme
+│   └── js/
+│       └── admin.js               # Firebase real-time operations
+├── routes/
+│   └── web.php                    # Route definitions
 └── ...
 ```
 
 ---
 
-## 🎨 Fitur Utama
+## 🎨 Screenshots
 
-### 📅 Booking System
-- Browse layanan modifikasi yang tersedia
-- Pemesanan dengan entry otomatis ke antrian
-- Estimasi waktu berdasarkan kapasitas bengkel
+### Login Page
+Dark theme login dengan branding Garasifyy.
 
-### 📊 Queue Management
-- Dashboard antrian real-time
-- Status pengerjaan (waiting/on_progress/completed)
-- Prioritas antrian
+### Dashboard
+Overview dengan statistik:
+- Total Antrian
+- Proyek Aktif
+- Selesai Bulan Ini
+- Total Revenue
 
-### 📈 Progress Tracking
-- Update persentase progres
-- Timeline pengerjaan
-- Notifikasi status
-
-### 📱 Dashboard & Analytics
-- Statistik performa bengkel
-- Laporan pekerjaan
-- Analisis efisiensi
+### Manajemen Proyek
+Tabel proyek dengan progress bar, status badge, dan action buttons.
 
 ---
 
-## 👥 Tim Pengembang
+## 📖 API Endpoints
 
-- **Developer**: Luthfy Arief
-- **Institusi**: Universitas Teknologi Bandung (UTB)
-- **Mata Kuliah**: UAS Mobile Programming 2
-
----
-
-## 📄 Lisensi
-
-Proyek ini dibuat untuk keperluan pendidikan.
-
-```
-© 2026 Garasify - Premium Car Modification Platform. All rights reserved.
-```
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/` | Redirect ke login |
+| GET | `/login` | Halaman login |
+| POST | `/login` | Proses login |
+| GET | `/logout` | Logout user |
+| GET | `/dashboard` | Admin dashboard |
+| GET | `/dashboard?debug_firebase` | Debug Firebase connection |
 
 ---
 
-<p align="center">
-  <strong>Garasiffy</strong> - One Stop Modification 🚗✨
-</p>
+## 🔒 Keamanan
+
+- ✅ Session-based authentication
+- ✅ CSRF protection via Laravel
+- ✅ Firebase service account for server-side auth
+- ✅ Access token caching (50 minutes)
+- ✅ Input validation on login
+- ✅ Logging for security audit
+
+---
+
+## 👨‍💻 Author
+
+**Luthfy Arief**
+- NIM: 23552011045
+- Kelas: TIF_RP_23_CNS_A
+- Mata Kuliah: UAS
+
+---
+
+## 📄 License
+
+MIT License - feel free to use this project for educational purposes.
