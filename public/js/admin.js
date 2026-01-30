@@ -682,4 +682,206 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Revenue Listener
     calculateRevenue();
 
+    // Mobile/Backup Event Listener for Report Generation
+    const btnGen = document.getElementById('btnGenerateReport');
+    if (btnGen) {
+        btnGen.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Generate Report Clicked (Listener)');
+            if (typeof window.generateReport === 'function') {
+                window.generateReport();
+            } else {
+                alert('Fungsi Report belum siap. Tunggu sebentar...');
+            }
+        });
+    }
+
+    // 5. Report Generation Logic
+
 });
+
+window.generateReport = async function () {
+    const startDate = document.getElementById('reportStartDate').value;
+    const endDate = document.getElementById('reportEndDate').value;
+    const status = document.getElementById('reportStatus').value;
+    const type = document.getElementById('reportType').value;
+
+    if (!startDate || !endDate) {
+        Swal.fire({ icon: 'warning', title: 'Validasi', text: 'Tanggal Mulai dan Akhir wajib diisi!', background: '#1e1e2d', color: '#fff' });
+        return;
+    }
+
+    // Ensure Firebase is ready when user Clicks
+    if (!window.firebaseModules || !window.firebaseDb) {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi Database belum siap. Silakan refresh halaman.', background: '#1e1e2d', color: '#fff' });
+        return;
+    }
+
+    Swal.fire({
+        title: 'Sedang memproses...',
+        html: 'Mengambil data...',
+        allowOutsideClick: false,
+        background: '#1e1e2d',
+        color: '#fff',
+        didOpen: () => { Swal.showLoading(); }
+    });
+
+    try {
+        const { collection, query, where, getDocs } = window.firebaseModules;
+        const db = window.firebaseDb;
+
+        // Convert dates
+        const start = new Date(startDate); start.setHours(0, 0, 0, 0);
+        const end = new Date(endDate); end.setHours(23, 59, 59, 999);
+
+        let colRef;
+        if (type === 'projects' || type === 'revenue') colRef = collection(db, 'projects');
+        else if (type === 'queue') colRef = collection(db, 'bookings');
+
+        // Build Query
+        let q = query(colRef,
+            where('createdAt', '>=', start),
+            where('createdAt', '<=', end)
+        );
+
+        const snapshot = await getDocs(q);
+        let data = [];
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            d.id = doc.id;
+            // Client-side filtering
+            if (status !== 'all' && (d.status || 'waiting') !== status) return;
+            data.push(d);
+        });
+
+        if (data.length === 0) {
+            Swal.fire({ icon: 'info', title: 'Tidak Ada Data', text: 'Tidak ada data pada periode tersebut.', background: '#1e1e2d', color: '#fff' });
+            return;
+        }
+
+        Swal.close();
+
+        // Ask for Format
+        const { isConfirmed, isDenied } = await Swal.fire({
+            title: 'Pilih Format Laporan',
+            text: `Ditemukan ${data.length} data. Pilih format download:`,
+            icon: 'question',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: '<i class="fas fa-file-pdf me-2"></i>PDF',
+            denyButtonText: '<i class="fas fa-file-excel me-2"></i>Excel',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#d32f2f',
+            denyButtonColor: '#198754',
+            background: '#1e1e2d',
+            color: '#fff'
+        });
+
+        if (isConfirmed) {
+            generatePDF(data, type, startDate, endDate);
+        } else if (isDenied) {
+            generateExcel(data, type, startDate, endDate);
+        }
+
+    } catch (e) {
+        console.error(e);
+        Swal.fire({ icon: 'error', title: 'Gagal', text: e.message, background: '#1e1e2d', color: '#fff' });
+    }
+};
+
+function generatePDF(data, type, start, end) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Header
+    doc.setFontSize(18);
+    doc.text('GARASIFYY REPORT', 14, 20);
+    doc.setFontSize(12);
+    doc.text(`Tipe: ${type.toUpperCase()}`, 14, 30);
+    doc.text(`Periode: ${start} s/d ${end}`, 14, 36);
+
+    let columns = [];
+    let rows = [];
+
+    if (type === 'projects') {
+        columns = ['Customer', 'Kendaraan', 'Layanan', 'Status', 'Biaya'];
+        rows = data.map(d => [d.customerName || d.name || '-', d.carModel || '-', d.serviceType || '-', d.status || '-', FormatMoney(d.totalCost || d.cost || 0)]);
+    } else if (type === 'revenue') {
+        columns = ['ID Proyek', 'Tanggal', 'Status', 'Pendapatan'];
+        let total = 0;
+        data.forEach(d => {
+            if (['completed', 'selesai', 'paid'].includes((d.status || '').toLowerCase())) {
+                let cost = parseInt(d.totalCost || d.cost || 0);
+                let dateStr = d.createdAt && d.createdAt.seconds ? new Date(d.createdAt.seconds * 1000).toLocaleDateString() : '-';
+                rows.push([d.id.substring(0, 8), dateStr, d.status, FormatMoney(cost)]);
+                total += cost;
+            }
+        });
+        rows.push(['TOTAL REVENUE', '', '', 'Rp ' + FormatMoney(total)]);
+    } else if (type === 'queue') {
+        columns = ['Nama', 'Plat', 'Layanan', 'Tanggal', 'Status'];
+        rows = data.map(d => {
+            let dateStr = d.bookingDate ? d.bookingDate : (d.createdAt && d.createdAt.seconds ? new Date(d.createdAt.seconds * 1000).toLocaleDateString() : '-');
+            return [d.name || d.customerName || '-', d.plateNumber || '-', d.serviceType || '-', dateStr, d.status || '-']
+        });
+    }
+
+    doc.autoTable({
+        startY: 45,
+        head: [columns],
+        body: rows,
+        theme: 'grid',
+        headStyles: { fillColor: [211, 47, 47] }
+    });
+
+    doc.save(`Garasifyy_${type}_${start}_${end}.pdf`);
+}
+
+function generateExcel(data, type, start, end) {
+    let exportData = [];
+
+    if (type === 'projects') {
+        exportData = data.map(d => ({
+            'ID': d.id,
+            'Customer': d.customerName || d.name || '-',
+            'Kendaraan': d.carModel || '-',
+            'Layanan': d.serviceType || '-',
+            'Status': d.status || '-',
+            'Biaya': d.totalCost || d.cost || 0
+        }));
+    } else if (type === 'revenue') {
+        exportData = data
+            .filter(d => ['completed', 'selesai', 'paid'].includes((d.status || '').toLowerCase()))
+            .map(d => ({
+                'ID Proyek': d.id,
+                'Tanggal': d.createdAt && d.createdAt.seconds ? new Date(d.createdAt.seconds * 1000).toLocaleDateString() : '-',
+                'Status': d.status,
+                'Pendapatan': parseInt(d.totalCost || d.cost || 0)
+            }));
+    } else if (type === 'queue') {
+        exportData = data.map(d => ({
+            'No Antrian': d.id,
+            'Nama': d.name || d.customerName || '-',
+            'Plat Nomor': d.plateNumber || '-',
+            'Layanan': d.serviceType || '-',
+            'Tanggal': d.bookingDate || (d.createdAt ? new Date(d.createdAt.seconds * 1000).toLocaleDateString() : '-'),
+            'Status': d.status || '-'
+        }));
+    }
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(exportData);
+
+    // Auto-width columns
+    const wscols = Object.keys(exportData[0] || {}).map(k => ({ wch: 20 }));
+    ws['!cols'] = wscols;
+
+    XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+    XLSX.writeFile(wb, `Garasifyy_${type}_${start}_${end}.xlsx`);
+}
+
+// Helper for Global Context
+function FormatMoney(amount) {
+    return new Intl.NumberFormat('id-ID').format(amount);
+}
+

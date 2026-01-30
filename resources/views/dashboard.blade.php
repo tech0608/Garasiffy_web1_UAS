@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- jsPDF for PDF Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <!-- FileSaver.js for reliable file downloads -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <!-- SweetAlert2 for Premium Alerts -->
@@ -481,7 +481,7 @@
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <button class="btn btn-danger" onclick="generateReport()">
+                                <button id="btnGenerateReport" class="btn btn-danger" onclick="generateReport()">
                                     <i class="fas fa-search me-2"></i>Generate Laporan
                                 </button>
                             </div>
@@ -663,7 +663,7 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/admin.js') }}"></script>
+    <script src="{{ asset('js/admin.js') }}?v={{ time() }}"></script>
 </body>
 
 </html>
