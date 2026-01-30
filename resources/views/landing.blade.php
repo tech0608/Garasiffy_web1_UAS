@@ -283,7 +283,7 @@
                         <a class="text-decoration-none mx-2 text-secondary" href="#"><i class="fab fa-facebook"></i></a>
                         <a class="text-decoration-none mx-2 text-secondary" href="#"><i class="fab fa-whatsapp"></i></a>
                     </div>
-                    <p class="text-secondary small opacity-50">© 2026 Garasifyy. All rights reserved.</p>
+                    <p class="text-secondary small opacity-50">@Copyright by 23552011045_Luthfy Arief_TIF RP 23 CNS A_UASWEB1</p>
                 </div>
             </div>
         </div>

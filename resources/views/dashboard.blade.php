@@ -62,6 +62,47 @@
             border-color: #d32f2f;
             box-shadow: 0 0 0 0.25rem rgba(211, 47, 47, 0.25);
         }
+
+        /* --- Full Width Header Fixes --- */
+        body {
+            padding-top: 60px; /* Space for fixed navbar */
+        }
+        
+        #sidebar-wrapper {
+            top: 60px; /* Push sidebar down */
+            height: calc(100vh - 60px);
+            z-index: 1000;
+        }
+
+        .navbar.fixed-top {
+            z-index: 1040;
+            background-color: #1e1e2d !important; /* Match card bg for seamless look */
+            height: 60px;
+        }
+
+        /* --- Fixed Footer --- */
+        .footer-fixed {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            left: 250px; /* Match Desktop Sidebar */
+            z-index: 1030;
+            background-color: #0f0f13; /* Darker bg for contrast */
+            border-top: 1px solid #2c2c35;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 991.98px) {
+            .footer-fixed {
+                left: 0; /* Full width on mobile */
+            }
+        }
+        
+        /* content padding so footer doesn't cover content */
+        #page-content-wrapper {
+             padding-bottom: 60px;
+        }
+
     </style>
 
     <!-- Firebase SDK - Connected to same database as mobile app -->
@@ -95,7 +136,39 @@
     </script>
 </head>
 
+
 <body class="admin-body">
+
+    <!-- Fixed Top Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom shadow-sm fixed-top">
+        <div class="container-fluid">
+            <!-- Sidebar Toggle -->
+            <button class="btn btn-outline-light me-3" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Brand -->
+            <a class="navbar-brand fw-bold me-auto" href="#">
+                GARASI<span class="text-danger">FYY</span> <span class="d-none d-md-inline text-secondary small ms-2">| Admin Panel</span>
+            </a>
+
+            <!-- User Menu -->
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <span class="nav-link text-light dropdown-toggle cp" role="button" data-bs-toggle="dropdown" style="cursor: pointer;">
+                        <i class="fas fa-user-circle me-1 text-danger"></i>
+                        <span id="adminEmail" class="d-none d-md-inline">admin@garasifyy.com</span>
+                    </span>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
+                         <li><h6 class="dropdown-header">User Profile</h6></li>
+                        <li><a class="dropdown-item" href="#" onclick="showChangePasswordModal()"><i class="fas fa-key me-2"></i>Ganti Password</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
 
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
@@ -133,29 +206,12 @@
         </div>
 
         <!-- Page Content -->
-        <div id="page-content-wrapper" class="flex-grow-1">
-            <!-- Top Navigation -->
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom shadow-sm">
-                <div class="container-fluid">
-                    <button class="btn btn-outline-light me-3" id="sidebarToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h5 class="mb-0 text-light">
-                        <i class="fas fa-user-shield text-danger me-2"></i>
-                        Admin Panel
-                    </h5>
-                        <span class="nav-link text-light dropdown-toggle" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-1"></i>
-                            <span id="adminEmail">admin@garasifyy.com</span>
-                        </span>
-                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" onclick="showChangePasswordModal()"><i class="fas fa-key me-2"></i>Ganti Password</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+        <!-- Page Content -->
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column min-vh-100">
+
+
+
 
             <!-- Main Content -->
             <div class="container-fluid p-4">
@@ -431,10 +487,19 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
         </div>
-    </div>
+        
+        <!-- Professional Footer -->
+        <!-- Fixed Footer Element -->
+        <footer class="footer-fixed py-3 text-center">
+            <div class="container-fluid">
+                <span class="text-secondary small opacity-75">
+                    @Copyright by 23552011045_Luthfy Arief_TIF RP 23 CNS A_UASWEB1
+                </span>
+            </div>
+        </footer>
+        </div> <!-- End Page Content Wrapper -->
+    </div> <!-- End Main Wrapper -->
 
     <!-- Update Status Modal -->
     <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-hidden="true">
@@ -595,11 +660,7 @@
         </div>
     </div>
 
-    <footer class="footer-custom">
-        <div class="container">
-            <p class="mb-0 small">@Copyright by 23552011045_Luthfy Arief_TIF_RP_23_CNS_A | Garasifyy Admin Panel</p>
-        </div>
-    </footer>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/admin.js') }}"></script>

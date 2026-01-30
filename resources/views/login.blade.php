@@ -135,7 +135,7 @@
 
     <footer class="footer-custom py-3 text-center">
         <div class="container">
-            <p class="mb-0 small opacity-50">© 2026 Garasifyy. All rights reserved.</p>
+            <p class="mb-0 small opacity-50">@Copyright by 23552011045_Luthfy Arief_TIF RP 23 CNS A_UASWEB1</p>
         </div>
     </footer>
 
