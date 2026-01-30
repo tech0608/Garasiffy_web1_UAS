@@ -7,6 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Initialize Bootstrap Tooltips (Premium Detail)
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
     // Destructure Firebase modules
     const { collection, query, onSnapshot, orderBy, doc, updateDoc, deleteDoc, getDocs, getDoc, where, Timestamp, addDoc, setDoc } = window.firebaseModules;
     const db = window.firebaseDb;
@@ -106,12 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const tbody = document.getElementById('queueTableBody');
 
         if (!tbody) return;
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">Loading data...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>';
 
         unsubscribeQueue = onSnapshot(q, (snapshot) => {
             tbody.innerHTML = '';
             if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Belum ada antrian.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-clipboard-list fa-3x"></i><h4>Belum ada antrian</h4><p class="text-muted">Data antrian akan muncul di sini.</p></div></td></tr>';
                 document.getElementById('queueBadge').innerText = '0';
                 return;
             }
@@ -152,18 +158,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load Projects (Projects Collection)
     function loadProjects() {
-        if (unsubscribeProjects) return; // Already listening
+        if (unsubscribeProjects) return;
 
         const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
         const tbody = document.getElementById('projectsTableBody');
 
         if (!tbody) return;
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">Loading projects...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="loading-spinner"></div></td></tr>';
 
         unsubscribeProjects = onSnapshot(q, (snapshot) => {
             tbody.innerHTML = '';
             if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Belum ada proyek aktif.</td></tr>';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <i class="fas fa-tasks fa-3x"></i>
+                                <h4>Belum ada proyek</h4>
+                                <p>Proyek yang sedang berjalan akan muncul di sini.</p>
+                            </div>
+                        </td>
+                    </tr>`;
                 return;
             }
 
@@ -176,16 +191,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = `
                     <tr>
                         <td>#${docSnap.id.substring(0, 6)}</td>
-                        <td>${data.serviceType || '-'} <br> <small class="text-muted">${data.carModel || '-'}</small></td>
+                        <td>
+                            <div class="fw-bold">${data.serviceType || '-'}</div>
+                            <small class="text-secondary"><i class="fas fa-car me-1"></i>${data.carModel || '-'}</small>
+                        </td>
                         <td>${data.customerName || data.customer || '-'}</td>
-                        <td style="width: 15%">
-                            <div class="progress" style="height: 6px;">
-                                <div class="progress-bar ${badgeClass}" style="width: ${progress}%"></div>
+                        <td style="width: 20%">
+                            <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                    <div class="progress-bar ${badgeClass}" style="width: ${progress}%"></div>
+                                </div>
+                                <span class="small fw-bold">${progress}%</span>
                             </div>
-                            <small>${progress}%</small>
                         </td>
                         <td><span class="badge ${badgeClass}">${capitalize(status)}</span></td>
-                        <td class="text-end">Rp ${formatMoney(data.totalCost || data.cost || 0)}</td>
+                        <td class="text-end fw-bold">Rp ${formatMoney(data.totalCost || data.cost || 0)}</td>
                         <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-outline-light" onclick="viewProject('${docSnap.id}')" title="Lihat Detail">
@@ -194,16 +214,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="btn btn-sm btn-outline-warning" onclick="updateStatus('${docSnap.id}', 'projects')" title="Update Status">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <!-- Actions based on status -->
-                                <!-- Actions based on status -->
-                                ${(status !== 'completed') ?
+                                ${(status !== 'completed' && status !== 'selesai' && status !== 'paid') ?
                         `<button class="btn btn-sm btn-outline-success" onclick="sendInvoice('${docSnap.id}')" title="${status === 'waiting_payment' ? 'Ubah Invoice' : 'Kirim Invoice'}">
-                                        <i class="fas fa-file-invoice-dollar"></i>
-                                    </button>` : ''}
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </button>` : ''}
                                 ${(status === 'waiting_payment') ?
                         `<button class="btn btn-sm btn-success" onclick="verifyPayment('${docSnap.id}')" title="Verifikasi Pembayaran">
-                                        <i class="fas fa-check-double"></i>
-                                    </button>` : ''}
+                                    <i class="fas fa-check-double"></i>
+                                </button>` : ''}
                             </div>
                         </td>
                     </tr>
@@ -216,20 +234,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load Services (Services Collection)
     function loadServices() {
         const q = query(collection(db, "services"), orderBy("price", "asc"));
-        const container = document.getElementById('services-container'); // Need to ensure this exists in HTML or handle it
-        // Or if it's a table? The user screen showed a "Layanan & Harga" section.
-        // Let's assume there's a container. If not, we might need to update dashboard.blade.php too or just target the generic row.
-        // Based on the browser agent's interaction, it targeted '#services-section .row.g-4'.
         const serviceSection = document.getElementById('services-section');
         if (!serviceSection) return;
-        const row = serviceSection.querySelector('.row');
-
+        const row = serviceSection.querySelector('.row.g-4');
         if (!row) return;
+
+        row.innerHTML = '<div class="col-12"><div class="loading-spinner"></div></div>';
 
         onSnapshot(q, (snapshot) => {
             row.innerHTML = '';
             if (snapshot.empty) {
-                row.innerHTML = '<div class="col-12 text-center text-muted">Belum ada layanan.</div>';
+                row.innerHTML = `
+                    <div class="col-12">
+                        <div class="empty-state">
+                            <i class="fas fa-tools fa-3x"></i>
+                            <h4>Belum ada layanan</h4>
+                            <p>Tambahkan layanan baru via tombol "Tambah Layanan".</p>
+                        </div>
+                    </div>`;
                 return;
             }
 
@@ -237,14 +259,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = docSnap.data();
                 const card = `
                     <div class="col-md-4 col-lg-3">
-                        <div class="stat-card bg-dark text-light h-100">
+                        <div class="stat-card bg-dark text-light h-100 border-secondary group-card">
                              <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="card-title text-danger fw-bold mb-0">${data.name}</h5>
-                                    <i class="fas fa-tools text-secondary opacity-50"></i>
+                                    <h5 class="card-title text-danger fw-bold mb-0">${data.title || data.name}</h5>
                                 </div>
-                                <p class="small text-muted mb-3">${data.description || ''}</p>
-                                <h4 class="text-white mb-0">Rp ${new Intl.NumberFormat('id-ID').format(data.price || 0)}</h4>
+                                <p class="small text-muted mb-3" style="min-height: 40px;">${data.description || 'Tidak ada deskripsi'}</p>
+                                <h4 class="text-white mb-0">Rp ${formatMoney(data.price || 0)}</h4>
                             </div>
                         </div>
                     </div>
@@ -254,6 +275,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Load Packages (Packages Collection)
+    function loadPackages() {
+        const q = query(collection(db, "packages"), orderBy("createdAt", "desc"));
+        const container = document.getElementById('packagesContainer');
+        if (!container) return;
+
+        container.innerHTML = '<div class="col-12"><div class="loading-spinner"></div></div>';
+
+        onSnapshot(q, (snapshot) => {
+            container.innerHTML = '';
+            if (snapshot.empty) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="empty-state">
+                            <i class="fas fa-box fa-3x"></i>
+                            <h4>Belum ada paket</h4>
+                            <p>Tambahkan paket maintenance/upgrade.</p>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const card = `
+                    <div class="col-md-4">
+                        <div class="card bg-dark text-light border-secondary h-100 position-relative shadow-sm hover-elevate">
+                            <div class="card-header bg-transparent border-bottom border-secondary text-center py-3">
+                                <h5 class="card-title text-danger fw-bold mb-0">${data.name}</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <h2 class="fw-bold mb-3">Rp ${formatMoney(data.price || 0)}</h2>
+                                <p class="text-muted small mb-4">${data.description || ''}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0 pb-3 text-center">
+                                <button class="btn btn-sm btn-outline-danger w-75 rounded-pill">Detail Paket</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        });
+    }
+
+
     // Listen for section changes to trigger loads
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
@@ -261,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const target = mutation.target;
                 if (!target.classList.contains('d-none')) {
                     if (target.id === 'services-section') loadServices();
+                    if (target.id === 'packages-section') loadPackages();
                 }
             }
         });
@@ -309,11 +377,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const modal = new bootstrap.Modal(modalEl);
                 modal.show();
             } else {
-                alert("Data proyek tidak ditemukan.");
+                Swal.fire({ icon: 'warning', title: 'Tidak Ditemukan', text: 'Data proyek tidak ditemukan.', background: '#1e1e2d', color: '#fff' });
             }
         } catch (e) {
             console.error("Error viewing project:", e);
-            alert("Terjadi kesalahan saat memuat data.");
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal memuat data.', background: '#1e1e2d', color: '#fff' });
         }
     };
 
@@ -353,6 +421,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const status = document.getElementById('editStatusSelect').value;
         const progress = document.getElementById('editProgress').value;
 
+        const result = await Swal.fire({
+            title: 'Simpan Perubahan?',
+            text: `Status akan diubah menjadi ${capitalize(status)} dengan progress ${progress}%`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d32f2f',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Simpan',
+            background: '#1e1e2d',
+            color: '#fff'
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             const docRef = doc(db, collectionName, id);
             await updateDoc(docRef, {
@@ -361,22 +443,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 updatedAt: new Date()
             });
 
-            // If completed, trigger revenue recalc
             if (status === 'completed' || status === 'selesai') {
                 calculateRevenue();
             }
 
-            // Close modal
             const modalEl = document.getElementById('updateStatusModal');
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
 
-            // Refresh UI
-            if (collectionName === 'bookings') loadQueue();
-            if (collectionName === 'projects') loadProjects();
+            Swal.fire({
+                title: 'Tersimpan!',
+                text: 'Data berhasil diperbarui.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#1e1e2d',
+                color: '#fff'
+            });
 
         } catch (e) {
-            alert("Error updating: " + e.message);
+            Swal.fire({ title: 'Error', text: e.message, icon: 'error', background: '#1e1e2d', color: '#fff' });
         }
     };
 
@@ -419,7 +505,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.verifyPayment = async function (id) {
-        if (!confirm("Verifikasi pembayaran pelanggan ini? Status akan menjadi 'Completed' dan masuk ke Revenue.")) return;
+        const result = await Swal.fire({
+            title: 'Verifikasi Pembayaran?',
+            text: "Status akan diubah menjadi 'Completed' dan dana masuk ke Revenue.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Verifikasi',
+            cancelButtonText: 'Batal',
+            background: '#1e1e2d',
+            color: '#fff'
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
             const docRef = doc(db, 'projects', id);
@@ -430,8 +529,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             calculateRevenue(); // Update financials
             loadProjects();
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Pembayaran terverifikasi.',
+                icon: 'success',
+                background: '#1e1e2d',
+                color: '#fff',
+                timer: 2000,
+                showConfirmButton: false
+            });
         } catch (e) {
-            alert("Error verifying payment: " + e.message);
+            Swal.fire({ title: 'Error', text: e.message, icon: 'error', background: '#1e1e2d', color: '#fff' });
         }
     };
 
@@ -447,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const price = document.getElementById('newServicePrice').value;
 
         if (!name || !price) {
-            alert("Nama dan Harga wajib diisi!");
+            Swal.fire({ icon: 'warning', title: 'Validasi', text: 'Nama dan Harga wajib diisi!', background: '#1e1e2d', color: '#fff' });
             return;
         }
 
@@ -548,10 +656,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function calculateRevenue() {
         if (revenueUnsub) return;
 
-        // Listen to ALL projects to filter locally or use compound query if index exists.
-        // For simplicity/small data, we listen to all and filter.
-        // Ideally: query(collection(db, 'projects'), where('status', 'in', ['completed', 'selesai']));
-
         const q = query(collection(db, "projects"));
 
         revenueUnsub = onSnapshot(q, (snapshot) => {
@@ -560,19 +664,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = doc.data();
                 const s = (data.status || '').toLowerCase();
                 if (s === 'completed' || s === 'selesai' || s === 'paid') {
-                    // Try to parse cost. Remove non-numeric if needed, or assume number
                     let cost = data.totalCost || data.cost || 0;
                     if (typeof cost === 'string') cost = parseInt(cost.replace(/\D/g, ''));
                     total += cost;
                 }
             });
 
-            // Update Dashboard Badge
-            // Assuming there's an element ID 'revenueBadge' or similar. 
-            // In the admin html provided, it might correspond to the 4th card value.
-            // Let's target by ID if we add one, or generic selector.
-            // The 4th stat-card h2 is Revenue.
-            const revenueDisplay = document.querySelector('.col-xl-3:nth-child(4) h2');
+            // Update Dashboard Badge via ID
+            const revenueDisplay = document.getElementById('totalRevenue');
             if (revenueDisplay) {
                 revenueDisplay.innerText = 'Rp ' + new Intl.NumberFormat('id-ID', { notation: "compact" }).format(total);
                 revenueDisplay.setAttribute('title', 'Rp ' + new Intl.NumberFormat('id-ID').format(total));

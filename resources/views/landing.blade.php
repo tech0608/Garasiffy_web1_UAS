@@ -20,6 +20,10 @@
             --text-dim: #a0a0a0;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             background-color: var(--dark-bg);
             color: var(--text-light);
