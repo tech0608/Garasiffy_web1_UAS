@@ -202,7 +202,7 @@ Garasifyy_Web/
 **Luthfy Arief**
 - NIM: 23552011045
 - Kelas: TIF_RP_23_CNS_A
-- Mata Kuliah: UAS
+- Mata Kuliah: PEMROGRAMAN WEB 1
 
 ---
 
