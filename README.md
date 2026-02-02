@@ -150,17 +150,25 @@ Garasifyy_Web/
 
 ## 🎨 Screenshots
 
+### Landing Page
+![Landing Page](screenshots/landing.png)
+*Homepage dengan hero section dan navigasi ke layanan.*
+
 ### Login Page
 ![Login Page](screenshots/login.png)
-*Modifikasi login page dengan tema gelap dan branding Garasifyy.*
+*Halaman login admin dengan tema gelap dan branding Garasifyy.*
 
 ### Dashboard
 ![Dashboard Overview](screenshots/dashboard.png)
-*Overview dashboard dengan statistik realtime dan data antrian.*
+*Overview dashboard dengan statistik realtime (Total Antrian, Proyek Aktif, Revenue) dan tabel proyek terbaru.*
+
+### Manajemen Antrian
+![Manajemen Antrian](screenshots/antrian.png)
+*Halaman untuk mengelola antrian booking pelanggan.*
 
 ### Manajemen Proyek
-![Create Service](screenshots/post-create-service.png)
-*Tampilan form dan manajemen data.*
+![Manajemen Proyek](screenshots/proyek.png)
+*Halaman untuk tracking progress pengerjaan modifikasi dengan status dan total biaya.*
 
 
 ---
