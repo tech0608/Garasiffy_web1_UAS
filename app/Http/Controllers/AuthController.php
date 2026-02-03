@@ -24,10 +24,37 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle login request
+     * Maximum login attempts before lockout
+     */
+    protected $maxAttempts = 5;
+    
+    /**
+     * Lockout duration in minutes
+     */
+    protected $decayMinutes = 5;
+
+    /**
+     * Handle login request with rate limiting
      */
     public function login(Request $request)
     {
+        // Get throttle key based on IP
+        $throttleKey = 'login_attempts_' . $request->ip();
+        
+        // Check if user is locked out
+        if ($this->hasTooManyLoginAttempts($throttleKey)) {
+            $seconds = $this->getRemainingLockoutSeconds($throttleKey);
+            $minutes = ceil($seconds / 60);
+            
+            Log::warning("Login blocked due to too many attempts from IP: " . $request->ip());
+            
+            return back()
+                ->withInput(['email' => $request->input('email')])
+                ->with('error', "Terlalu banyak percobaan login. Silakan tunggu {$minutes} menit sebelum mencoba lagi.")
+                ->with('locked', true)
+                ->with('lockout_seconds', $seconds);
+        }
+
         // Validate input
         $request->validate([
             'email' => 'required|email',
@@ -42,6 +69,9 @@ class AuthController extends Controller
 
         // Validate credentials
         if ($email === $credentials['email'] && $password === $credentials['password']) {
+            // Clear login attempts on successful login
+            $this->clearLoginAttempts($throttleKey);
+            
             session(['user_id' => 'admin']);
             session(['role' => 'admin']);
             session(['email' => $email]);
@@ -51,11 +81,69 @@ class AuthController extends Controller
             return redirect()->route('dashboard');
         }
 
-        Log::warning("Failed login attempt for: {$email}");
+        // Increment failed login attempts
+        $this->incrementLoginAttempts($throttleKey);
+        $attemptsLeft = $this->maxAttempts - $this->getLoginAttempts($throttleKey);
+        
+        Log::warning("Failed login attempt for: {$email} from IP: " . $request->ip() . " (Attempts left: {$attemptsLeft})");
+        
+        $errorMessage = 'Email atau password salah.';
+        if ($attemptsLeft > 0 && $attemptsLeft <= 3) {
+            $errorMessage .= " Sisa percobaan: {$attemptsLeft}";
+        }
         
         return back()
             ->withInput(['email' => $email])
-            ->with('error', 'Email atau password salah');
+            ->with('error', $errorMessage)
+            ->with('attempts_left', $attemptsLeft);
+    }
+
+    /**
+     * Check if user has too many login attempts
+     */
+    protected function hasTooManyLoginAttempts(string $key): bool
+    {
+        return Cache::has($key . '_lockout');
+    }
+
+    /**
+     * Get remaining lockout seconds
+     */
+    protected function getRemainingLockoutSeconds(string $key): int
+    {
+        $lockoutUntil = Cache::get($key . '_lockout');
+        return max(0, $lockoutUntil - time());
+    }
+
+    /**
+     * Increment login attempts
+     */
+    protected function incrementLoginAttempts(string $key): void
+    {
+        $attempts = Cache::get($key, 0) + 1;
+        Cache::put($key, $attempts, now()->addMinutes($this->decayMinutes));
+        
+        if ($attempts >= $this->maxAttempts) {
+            // Set lockout
+            Cache::put($key . '_lockout', time() + ($this->decayMinutes * 60), now()->addMinutes($this->decayMinutes));
+        }
+    }
+
+    /**
+     * Get current login attempts
+     */
+    protected function getLoginAttempts(string $key): int
+    {
+        return Cache::get($key, 0);
+    }
+
+    /**
+     * Clear login attempts
+     */
+    protected function clearLoginAttempts(string $key): void
+    {
+        Cache::forget($key);
+        Cache::forget($key . '_lockout');
     }
 
     /**

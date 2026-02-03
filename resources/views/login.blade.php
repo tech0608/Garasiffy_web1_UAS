@@ -85,8 +85,30 @@
                 </h4>
 
                 <!-- Error Message -->
-                <!-- Error Message -->
-                @if(session('error'))
+                @if(session('locked'))
+                    <div class="alert alert-warning text-center mb-4" style="background-color: #2c2c35; border: 2px solid #ff9800; color: #ff9800;">
+                        <i class="fas fa-ban me-2 fa-lg"></i>
+                        <strong>AKSES DIBLOKIR!</strong>
+                        <p class="mb-0 mt-2">{{ session('error') }}</p>
+                        <div class="mt-2">
+                            <i class="fas fa-clock me-1"></i>
+                            <span id="countdown">{{ session('lockout_seconds') }}</span> detik tersisa
+                        </div>
+                    </div>
+                    <script>
+                        let seconds = {{ session('lockout_seconds') }};
+                        const countdown = document.getElementById('countdown');
+                        const timer = setInterval(() => {
+                            seconds--;
+                            if (seconds <= 0) {
+                                clearInterval(timer);
+                                location.reload();
+                            } else {
+                                countdown.textContent = seconds;
+                            }
+                        }, 1000);
+                    </script>
+                @elseif(session('error'))
                     <div class="alert alert-danger text-center mb-4 bg-dark border-danger text-danger">
                         <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
                     </div>
