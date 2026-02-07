@@ -176,9 +176,9 @@ Garasifyy_Web/
 
 Berikut adalah video demonstrasi lengkap dari aplikasi Garasifyy Admin Panel:
 
-https://github.com/user-attachments/assets/video-dokumentasi
+📹 **[Klik di sini untuk menonton Video Demo](screenshots/video%20dokumentasi.mp4)**
 
-> 📹 **Video Demo**: Klik link di atas atau download video dari folder `screenshots/video dokumentasi.mp4`
+> 💡 **Tip**: Klik link di atas, kemudian klik tombol "View raw" atau "Download" untuk memutar video.
 
 Video ini mencakup:
 - ✅ Login ke Admin Panel
