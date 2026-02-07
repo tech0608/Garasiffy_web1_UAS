@@ -170,6 +170,22 @@ Garasifyy_Web/
 ![Manajemen Proyek](screenshots/proyek.png)
 *Halaman untuk tracking progress pengerjaan modifikasi dengan status dan total biaya.*
 
+---
+
+## 🎬 Video Dokumentasi
+
+Berikut adalah video demonstrasi lengkap dari aplikasi Garasifyy Admin Panel:
+
+https://github.com/user-attachments/assets/video-dokumentasi
+
+> 📹 **Video Demo**: Klik link di atas atau download video dari folder `screenshots/video dokumentasi.mp4`
+
+Video ini mencakup:
+- ✅ Login ke Admin Panel
+- ✅ Overview Dashboard dengan statistik realtime
+- ✅ Manajemen Antrian pelanggan
+- ✅ Tracking progress pengerjaan proyek
+- ✅ Pengaturan layanan dan harga
 
 ---
 
