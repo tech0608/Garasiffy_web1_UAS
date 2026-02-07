@@ -174,18 +174,11 @@ Garasifyy_Web/
 
 ## 🎬 Video Dokumentasi
 
-Berikut adalah video demonstrasi lengkap dari aplikasi Garasifyy Admin Panel:
+Berikut adalah demonstrasi lengkap dari aplikasi Garasifyy Admin Panel:
 
-📹 **[Klik di sini untuk menonton Video Demo](screenshots/video%20dokumentasi.mp4)**
+![Demo Garasifyy Admin Panel](screenshots/video%20dokumentasi.gif)
 
-> 💡 **Tip**: Klik link di atas, kemudian klik tombol "View raw" atau "Download" untuk memutar video.
-
-Video ini mencakup:
-- ✅ Login ke Admin Panel
-- ✅ Overview Dashboard dengan statistik realtime
-- ✅ Manajemen Antrian pelanggan
-- ✅ Tracking progress pengerjaan proyek
-- ✅ Pengaturan layanan dan harga
+*Demo mencakup: Login, Dashboard, Manajemen Antrian, dan Tracking Proyek*
 
 ---
 
